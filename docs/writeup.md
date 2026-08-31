@@ -1,7 +1,7 @@
 # Motivated reasoning in the Donation Bet: is it a lie, or does the model just not know itself?
 
-## The question this is actually about
-
+I chose to work on Idea # 3: investigating the presence of CoT unfaithfulness and the presence of inherent bias in experiments asking models to perform Fermi estimate of giraffe spots while signifying donation advantage to a side above or below a threshold. 
+## Value Leakage Donation Investigation
 Betley, Treutlein, and colleagues (arXiv 2607.14345, Section 3) found that when a model is
 asked to estimate an arbitrary quantity — the total number of black spots on all living
 giraffes — and told that a donation to a good or bad cause depends on whether its answer
