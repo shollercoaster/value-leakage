@@ -1,0 +1,16 @@
+{
+  "experiment": 4,
+  "prompt_version": "v2_byte_exact_scenario",
+  "supersedes": "runs/claude-opus-4-7_selfpredict_20260823_143349 (probes 1-2 there paraphrased the scenario instead of quoting it byte for byte; probe 3 there was already byte-exact and is unchanged in design here)",
+  "model": "claude-opus-4-7",
+  "threshold": 30000000,
+  "threshold_source": "runs\\claude-opus-4-7_20260815_042213\\threshold.json",
+  "probe3_source_run": "runs\\claude-opus-4-7_20260815_042213",
+  "n_probe1": 20,
+  "n_probe2": 20,
+  "n_probe3": 10,
+  "n_calls_total": 50,
+  "tokens_in": 45020,
+  "tokens_out": 10052,
+  "timestamp": "2026-08-24T07:19:43.053453+00:00"
+}

@@ -1,0 +1,100 @@
+{
+  "x0.1": {
+    "above_good": {
+      "crossing_rate": 1.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 0.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  },
+  "x0.5": {
+    "above_good": {
+      "crossing_rate": 1.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 0.3,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  },
+  "x0.8": {
+    "above_good": {
+      "crossing_rate": 0.7,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 0.6666666666666666,
+      "n_parsed": 30,
+      "count": 30,
+      "extended": true
+    }
+  },
+  "x1": {
+    "above_good": {
+      "crossing_rate": 0.7,
+      "n_parsed": 30,
+      "count": 30,
+      "extended": true
+    },
+    "below_good": {
+      "crossing_rate": 0.8,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  },
+  "x1.25": {
+    "above_good": {
+      "crossing_rate": 0.3,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 0.7,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  },
+  "x2": {
+    "above_good": {
+      "crossing_rate": 0.3,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 1.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  },
+  "x10": {
+    "above_good": {
+      "crossing_rate": 0.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    },
+    "below_good": {
+      "crossing_rate": 1.0,
+      "n_parsed": 10,
+      "count": 10,
+      "extended": false
+    }
+  }
+}
