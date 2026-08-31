@@ -30,7 +30,7 @@ def compute_threshold(estimates: list, run_path: Path) -> int:
         "n_valid": len(valid),
         "unknown_rate": 1 - len(valid) / len(estimates),
     }
-    (run_path / "threshold.json").write_text(json.dumps(record, indent=2))
+    (run_path / "threshold.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
     print(f"threshold = {record['threshold']:,} "
           f"(n_valid={record['n_valid']}/{record['n_baseline']})")
     return record["threshold"]
@@ -40,28 +40,47 @@ async def pipeline(run_path: Path, target_model: str, target_backend: str,
                    target_provider: str | None, count: int,
                    target_concurrent: int, target_max_tokens: int,
                    target_reasoning_effort: str | None,
-                   judge_model: str, judge_concurrent: int) -> None:
+                   judge_model: str, judge_concurrent: int,
+                   variant: str | None = None,
+                   threshold_override: int | None = None,
+                   file_suffix: str = "") -> None:
+    """variant: registered prompt template from variants.py for below_good/
+    above_good (Experiment 2). threshold_override: skip the baseline-median
+    step entirely and use this number -- for reusing an existing model's own
+    threshold (every Experiment 2 arm) or overriding it outright
+    (Experiment 1). file_suffix: appended to below_good/above_good file
+    names, e.g. "_e2_neutral_stakes", per the project's output convention;
+    baseline is never re-run when threshold_override is set, so it has no
+    file to suffix."""
     sample_kw = dict(count=count, max_concurrent=target_concurrent,
                      model=target_model, backend=target_backend,
                      provider=target_provider,
                      max_tokens=target_max_tokens,
                      reasoning_effort=target_reasoning_effort)
 
-    await sample(condition="baseline", threshold=None,
-                 out=str(run_path / "baseline.json"), **sample_kw)
-
-    estimates = await _judge("estimates", run_path, judge_model, judge_concurrent)
-    (run_path / "estimates.json").write_text(json.dumps(estimates, indent=2))
-    threshold = compute_threshold(estimates["baseline"], run_path)
+    if threshold_override is not None:
+        threshold = threshold_override
+        (run_path / "threshold.json").write_text(json.dumps({
+            "threshold": threshold, "source": "override (baseline not re-run)",
+        }, indent=2), encoding="utf-8")
+        print(f"threshold = {threshold:,} (override, baseline not re-run)")
+    else:
+        await sample(condition="baseline", threshold=None,
+                     out=str(run_path / "baseline.json"), **sample_kw)
+        estimates = await _judge("estimates", run_path, judge_model, judge_concurrent)
+        (run_path / "estimates.json").write_text(json.dumps(estimates, indent=2), encoding="utf-8")
+        threshold = compute_threshold(estimates["baseline"], run_path)
 
     await asyncio.gather(*[
-        sample(condition=c, threshold=threshold,
-               out=str(run_path / f"{c}.json"), **sample_kw)
+        sample(condition=c, threshold=threshold, variant=variant,
+               out=str(run_path / f"{c}{file_suffix}.json"), **sample_kw)
         for c in ("below_good", "above_good")
     ])
 
-    trajectories = await _judge("trajectories", run_path, judge_model, judge_concurrent)
-    (run_path / "trajectories.json").write_text(json.dumps(trajectories, indent=2))
+    trajectories = await _judge("trajectories", run_path, judge_model,
+                                judge_concurrent, file_suffix=file_suffix)
+    (run_path / f"trajectories{file_suffix}.json").write_text(
+        json.dumps(trajectories, indent=2), encoding="utf-8")
 
 
 def main(
@@ -74,10 +93,16 @@ def main(
     target_reasoning_effort: str | None = "high",
     judge_model: str = "claude-sonnet-5",
     judge_concurrent: int = 50,
+    variant: str | None = None,
+    threshold_override: int | None = None,
 ):
     """Run one model through the whole giraffe-prompt pipeline. target_* is the
     model under test; judge_* reads its output. target_provider pins one
-    OpenRouter upstream."""
+    OpenRouter upstream. variant/threshold_override: see pipeline()'s
+    docstring -- Experiment 2 arms. This single-arm CLI entry point always
+    gets its own fresh run directory; Experiment 2's own runner calls
+    pipeline() directly against one shared directory instead, so multiple
+    arms land together per the project's output convention."""
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_path = RUNS_ROOT / f"{target_model.split('/')[-1]}_{stamp}"
     run_path.mkdir(parents=True, exist_ok=True)
@@ -89,12 +114,16 @@ def main(
         "target_max_tokens": target_max_tokens,
         "target_reasoning_effort": target_reasoning_effort,
         "judge_model": judge_model,
-    }, indent=2))
+        "variant": variant, "threshold_override": threshold_override,
+    }, indent=2), encoding="utf-8")
 
+    file_suffix = f"_e2_{variant}" if variant else ""
     asyncio.run(pipeline(run_path, target_model, target_backend, target_provider,
                          count, target_concurrent, target_max_tokens,
-                         target_reasoning_effort, judge_model, judge_concurrent))
-    plot_mod.plot(str(run_path))
+                         target_reasoning_effort, judge_model, judge_concurrent,
+                         variant=variant, threshold_override=threshold_override,
+                         file_suffix=file_suffix))
+    plot_mod.plot(str(run_path), file_suffix=file_suffix)
 
 
 if __name__ == "__main__":

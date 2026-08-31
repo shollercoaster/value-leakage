@@ -146,11 +146,19 @@ def factor(trajectories: dict, threshold: float,
     return out
 
 
-def plot(run_dir: str, filename: str = "fig.png"):
-    """Render the figure and write factor.json."""
+def plot(run_dir: str, filename: str = "fig.png", file_suffix: str = "",
+         threshold_file: str = "threshold.json"):
+    """Render the figure and write factor.json.
+
+    file_suffix: reads trajectories{file_suffix}.json and writes
+    fig{file_suffix}.png / factor{file_suffix}.json -- lets one run
+    directory hold multiple arms (Experiment 2) without collisions.
+    threshold_file: override when the run directory's threshold.json isn't
+    the right one to read (shouldn't normally be needed; every Experiment 2
+    arm reuses the same threshold.json a plain threshold_override run wrote)."""
     run_path = Path(run_dir)
-    threshold = json.loads((run_path / "threshold.json").read_text())["threshold"]
-    trajectories = json.loads((run_path / "trajectories.json").read_text())
+    threshold = json.loads((run_path / threshold_file).read_text(encoding="utf-8"))["threshold"]
+    trajectories = json.loads((run_path / f"trajectories{file_suffix}.json").read_text(encoding="utf-8"))
 
     stats = factor(trajectories, threshold)
     grid = np.linspace(0, 1, N_GRID)
@@ -193,21 +201,22 @@ def plot(run_dir: str, filename: str = "fig.png"):
 
     config = run_path / "config.json"
     if config.exists():
-        meta = json.loads(config.read_text())
+        meta = json.loads(config.read_text(encoding="utf-8"))
         ax.set_title(f"{meta.get('model', '')} · {meta.get('task', 'giraffes')} · "
                      f"threshold {threshold:,}", fontsize=11, color=INK_MUTED)
 
     fig.tight_layout()
-    fig.savefig(run_path / filename, dpi=150, bbox_inches="tight", pad_inches=0.25)
+    out_filename = filename if not file_suffix else filename.replace(".png", f"{file_suffix}.png")
+    fig.savefig(run_path / out_filename, dpi=150, bbox_inches="tight", pad_inches=0.25)
     plt.close(fig)
 
-    (run_path / "factor.json").write_text(json.dumps(stats, indent=2))
+    (run_path / f"factor{file_suffix}.json").write_text(json.dumps(stats, indent=2), encoding="utf-8")
     print(json.dumps(stats, indent=2))
-    print(f"saved {run_path / filename}")
+    print(f"saved {run_path / out_filename}")
 
 
-def main(run_dir: str, filename: str = "fig.png"):
-    plot(run_dir, filename)
+def main(run_dir: str, filename: str = "fig.png", file_suffix: str = ""):
+    plot(run_dir, filename, file_suffix)
 
 
 if __name__ == "__main__":

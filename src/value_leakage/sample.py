@@ -1,9 +1,18 @@
 """Sample the Value Leakage donation-bet giraffe prompt.
 
-Backend is 'fireworks', 'openrouter', or 'anthropic'; model ids differ between
-them. On 'anthropic' the reasoning field is a SUMMARY of the trace, not the raw
-chain of thought — Claude never returns raw CoT. Verified on opus-4-7 that the
-summary keeps the ordered intermediate estimates the trajectory judge needs.
+Backend is 'fireworks', 'openrouter', 'huggingface', or 'anthropic'; model ids
+differ between them. On 'anthropic' the reasoning field is a SUMMARY of the
+trace, not the raw chain of thought — Claude never returns raw CoT. Verified
+on opus-4-7 that the summary keeps the ordered intermediate estimates the
+trajectory judge needs.
+
+'huggingface' routes through Hugging Face's Inference Providers proxy
+(https://router.huggingface.co/v1), an OpenAI-compatible endpoint in front of
+partner providers (deepinfra, novita, ...) at the provider's own rate, no HF
+markup. Pin a specific provider with a ":<provider>" suffix on the model id
+(e.g. "Qwen/Qwen3.5-122B-A10B:deepinfra") rather than a separate provider
+argument -- unlike 'openrouter', there is no `provider` kwarg for this
+backend; fold the suffix into `model` instead.
 """
 
 import asyncio
@@ -13,10 +22,12 @@ from pathlib import Path
 from value_leakage.api.anthropic.messages import get_anthropic_client
 from value_leakage.api.fireworks.chat_completions import (
     get_fireworks_client, process_batch as fireworks_batch)
+from value_leakage.api.huggingface.chat_completions import (
+    get_huggingface_client, process_batch as huggingface_batch)
 from value_leakage.api.openrouter.chat_completions import (
     get_openrouter_client, process_batch as openrouter_batch)
 
-BACKENDS = ("fireworks", "openrouter", "anthropic")
+BACKENDS = ("fireworks", "openrouter", "huggingface", "anthropic")
 
 
 BASELINE = """\
@@ -99,10 +110,22 @@ async def sample(
     out: str,
     backend: str = "fireworks",
     provider: str | None = None,
+    variant: str | None = None,
 ) -> None:
+    """variant selects a registered prompt template from variants.py instead
+    of the original below_good/above_good wording (Experiment 2). Only
+    below_good/above_good have variants -- baseline has none, and passing a
+    variant with condition='baseline' is an error, since every arm reuses
+    the original model's own baseline rather than getting a new one."""
     if backend not in BACKENDS:
         raise ValueError(f"backend must be one of {BACKENDS}, got {backend!r}")
-    prompt = build_prompt(condition, threshold)
+    if variant is not None:
+        if condition == "baseline":
+            raise ValueError("variants only apply to below_good/above_good, not baseline")
+        from value_leakage.variants import build_variant_prompt
+        prompt = build_variant_prompt(variant, condition, threshold)
+    else:
+        prompt = build_prompt(condition, threshold)
     messages_list = [[{"role": "user", "content": prompt}]] * count
     print(f"Running {model} via {backend} | condition={condition} | count={count}")
 
@@ -119,6 +142,19 @@ async def sample(
             max_tokens=max_tokens,
             max_concurrent=max_concurrent,
             reasoning_effort=reasoning_effort,
+            return_exceptions=True,
+        )
+    elif backend == "huggingface":
+        # Provider selection is a suffix on the model id for this backend
+        # (":deepinfra", ":fastest", ...), not a separate field -- fold
+        # `provider` in here rather than passing it through as a kwarg.
+        hf_model = f"{model}:{provider}" if provider else model
+        responses = await huggingface_batch(
+            client=get_huggingface_client(),
+            model=hf_model,
+            messages_list=messages_list,
+            max_tokens=max_tokens,
+            max_concurrent=max_concurrent,
             return_exceptions=True,
         )
     else:
@@ -161,7 +197,7 @@ async def sample(
          "condition": condition, "threshold": threshold, "prompt": prompt,
          "max_tokens": max_tokens, "reasoning_effort": reasoning_effort,
          "rows": rows},
-        indent=2, ensure_ascii=False))
+        indent=2, ensure_ascii=False), encoding="utf-8")
 
     ok = sum(1 for r in responses if not isinstance(r, Exception))
     print(f"{ok}/{count} succeeded — saved results to {out_path}")

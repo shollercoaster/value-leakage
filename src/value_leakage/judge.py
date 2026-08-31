@@ -119,10 +119,10 @@ def parse_trajectory(raw) -> list[int] | None:
     return nums or None
 
 
-def _sources(run_dir: Path, condition: str, field: str) -> list[str | None]:
+def _sources(run_dir: Path, condition: str, field: str, file_suffix: str = "") -> list[str | None]:
     """Per-rollout judge input, index-aligned with the sample rows. None marks a
     rollout with no usable text (API error, empty trace)."""
-    data = json.loads((run_dir / f"{condition}.json").read_text())
+    data = json.loads((run_dir / f"{condition}{file_suffix}.json").read_text(encoding="utf-8"))
     out = []
     for row in data["rows"]:
         text = row.get(field) or ""
@@ -130,7 +130,8 @@ def _sources(run_dir: Path, condition: str, field: str) -> list[str | None]:
     return out
 
 
-async def _judge(kind: str, run_dir: Path, model: str, max_concurrent: int) -> dict:
+async def _judge(kind: str, run_dir: Path, model: str, max_concurrent: int,
+                  file_suffix: str = "") -> dict:
     template = NUMBER_JUDGE_PROMPT if kind == "estimates" else TRAJECTORY_JUDGE_PROMPT
     field = "content" if kind == "estimates" else "reasoning"
     parse = parse_tagged_estimate if kind == "estimates" else parse_trajectory
@@ -138,10 +139,10 @@ async def _judge(kind: str, run_dir: Path, model: str, max_concurrent: int) -> d
     client = get_anthropic_client()
     out = {}
     for condition in CONDITIONS:
-        path = run_dir / f"{condition}.json"
+        path = run_dir / f"{condition}{file_suffix}.json"
         if not path.exists():
             continue
-        sources = _sources(run_dir, condition, field)
+        sources = _sources(run_dir, condition, field, file_suffix)
         todo = [(i, s) for i, s in enumerate(sources) if s is not None]
         print(f"{kind}: {condition} — judging {len(todo)}/{len(sources)}")
         responses = await process_batch(
@@ -168,7 +169,7 @@ def _run(kind: str, run_dir: str, model: str, max_concurrent: int) -> None:
     run_path = Path(run_dir)
     out = asyncio.run(_judge(kind, run_path, model, max_concurrent))
     out_path = run_path / f"{kind}.json"
-    out_path.write_text(json.dumps(out, indent=2))
+    out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(f"saved {out_path}")
 
 
