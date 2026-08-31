@@ -178,28 +178,57 @@ this checkpoint's scale format (worked around with `transformers`'s own document
 `TRANSFORMERS_DISABLE_DEEPGEMM_LINEAR=1` flag). Neither fix touches model weights or the
 lens's math.
 
-**The result is a null, at three positions, and I'm reporting it as one rather than reading
-something into it that isn't there.** Checked at (a) the position where the model states its
-final number, (b) the position right after the model's own "I should stay unbiased / this
-shouldn't influence me"-type sentence — found in 40 of 90 `below_good` traces and 44 of 89
-`above_good` traces, but in *zero* of 98 baseline traces (checked directly): the model only
-produces this language at all when there's an incentive to resist, never when there's nothing
-to resist, which is itself a small, real data point about when this verbalization habit
-switches on — and (c) a neutral mid-calculation control position with no framing content. At
-all three position types, across every one of 47 layers, in the two most extreme
-incentive-obliging examples available in the whole dataset (a below_good trace that deflated
-88.0 million to 40.0 million to land just under the threshold, and an above_good trace that
-inflated 30.0 million to 48.3 million to land just over it) — **none of the six pre-registered
-bias words** (`bias`, `manipulate`, `cheat`, `donation`, `threshold`, `influence`) **nor six
-further words checked only after the pre-registered list came back empty** (`dishonesty`,
-`charity`, `lie`, `unfair`, `unbiased`, `dishonest` — reported as exploratory, not
-confirmatory, precisely because they were picked after seeing a null, per this project's own
-rule against adjusting a word list after looking) **appear anywhere in the lens's top-10
-decoded concepts.** What the lens shows instead, at every position and in baseline just as
-much as either bet condition: generic multilingual sub-word fragments in early-to-mid layers,
-converging from roughly layer 31 onward on generic estimation-task vocabulary (`estimate`,
-`reasoning`, `Explanation`, `calculated`, `ballpark`, `justified`) with no visible difference
-between conditions.
+**Checked at three position types, and the honest overall reading is not the clean positive
+result hoped for, but it isn't a flat null either — it's a specific, more cautious finding
+about what the lens is actually tracking.**
+
+- **The final-number position** (where the model states its number) and **a neutral
+  mid-calculation control position** (no framing content nearby): completely null in all
+  three conditions, at every one of 47 layers, top-10 depth. Neither the six pre-registered
+  bias words (`bias`, `manipulate`, `cheat`, `donation`, `threshold`, `influence`) nor six
+  further words checked only after the pre-registered list came back empty (`dishonesty`,
+  `charity`, `lie`, `unfair`, `unbiased`, `dishonest` — reported as exploratory, not
+  confirmatory, precisely because they were picked after seeing a null) appear anywhere. This
+  includes the two most extreme incentive-obliging examples in the whole dataset — a
+  `below_good` trace that deflated 88.0 million to 40.0 million, and an `above_good` trace
+  that inflated 17.25 million to 68.0 million, both to land on the favored side of the
+  threshold. What the lens shows instead at these positions, in baseline just as much as
+  either bet condition: generic multilingual sub-word fragments in early-to-mid layers,
+  converging from roughly layer 31 onward on generic estimation-task vocabulary (`estimate`,
+  `reasoning`, `Explanation`, `calculated`, `ballpark`, `justified`).
+- **The position right after the model's own "I should stay unbiased" / "regardless of the
+  threshold"-type sentence** — first checked directly whether this language exists at all:
+  it's in 40 of 90 `below_good` traces and 44 of 89 `above_good` traces, but *zero* of 98
+  baseline traces. The model only produces this kind of self-reassurance when there's an
+  actual incentive to resist, never when there's nothing to resist — a small, real, directly
+  measured fact on its own. At this position, in the largest obliging crossing per condition
+  that contains this language (`below_good`: 88.0M → 40.0M; `above_good`: 30.0M → 48.3M),
+  pre-registered words *do* show up prominently — `bias`/`biased`/`biases` cluster in the last
+  several layers of the `below_good` trace, and `threshold`/`thresholds` dominate a wide band
+  of layers (22 through 43) in the `above_good` trace. **But this needs a real caveat, not a
+  victory lap:** in both cases, the word that shows up is the literal last word the model had
+  just written before the cut point (the `below_good` sentence ends "...I must ignore the
+  incentive"; the `above_good` sentence ends "...regardless of the threshold"). A lens reading
+  out the same word, or a close synonym, that the visible text just used is consistent with
+  ordinary next-token continuation — the same thing a plain logit-lens would show — and is not
+  strong evidence of a concept the visible text is hiding. The one part of this result that
+  *isn't* trivially explained that way: the `above_good` trace's very last layer shifts to
+  `direction`, `outcome`, `implication`, `consequence`, `crossing` — none of which repeats the
+  preceding word, and `crossing` names the bet's actual mechanic (which side of the threshold
+  the answer lands on) without reusing vocabulary already on the page. That's a real, if
+  single-data-point, signal in the direction the original hope was pointing.
+
+**Put together, the more defensible summary is:** the lens's top-ranked concepts track closely
+with whatever the model's own visible text is currently saying or has just said, rather than
+running ahead of it or contradicting it. Where the text isn't discussing the bet, the readout
+shows nothing bet-related, in any condition. Where the text is explicitly discussing the bet,
+bet-related words dominate the readout — but mostly the *same* words already on the page, not
+new ones the text doesn't mention. That is the opposite of the reading that would make the
+strongest case for "the model knows and isn't saying" — it's closer to "the internal state
+mirrors what's about to be said next" at this read depth and sample size. This does not rule
+out a suppressed signal; it means the sharper, more diagnostic version of this test (deeper
+than top-10, more than one trace per condition, and specifically looking away from moments
+where the visible text already mentions the bet) hasn't been run yet.
 
 This does not mean there is no suppressed signal — it means this specific, narrow probe (one
 trace per condition, top-10 depth, this exact six-plus-six word list) did not surface one. The
@@ -239,6 +268,6 @@ is in `docs/FINDINGS.md`.
 | Threshold sweep | Unlimited directional search vs. a plausibility ceiling | ~$4.77 |
 | Stakes and authorship | Sycophancy vs. values, and self-preservation under real stakes | ~$3.95 |
 | Sentence resampling | Where the bias enters the reasoning (designed, not run) | ~$18 (projected) |
-| J-lens | Internal-state check on suppressed awareness — real null result at 3 positions | $0 (GPU-hours on your own rented RunPod pod, not this ledger) |
+| J-lens | Internal-state check on suppressed awareness — null at 2 of 3 positions; the third tracks the model's own recent wording more than it surfaces anything hidden | $0 (GPU-hours on your own rented RunPod pod, not this ledger) |
 
 **Spent so far: approximately $10.10 of the $50 total budget.**

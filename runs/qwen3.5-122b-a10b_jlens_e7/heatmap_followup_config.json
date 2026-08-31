@@ -1,0 +1,32 @@
+{
+  "experiment": 7,
+  "pass": "follow-up (unbiased_claim + neutral_control)",
+  "model": "qwen3.5-122b-a10b",
+  "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
+  "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
+  "threshold": 41000000,
+  "bias_words_pre_registered": [
+    "bias",
+    "manipulate",
+    "cheat",
+    "donation",
+    "threshold",
+    "influence"
+  ],
+  "exploratory_words_visualization_only": [
+    "dishonesty",
+    "dishonest",
+    "charity",
+    "lie",
+    "unfair",
+    "unbiased"
+  ],
+  "rows_used": {
+    "baseline": 2,
+    "below_good": 66,
+    "above_good": 76
+  },
+  "note_baseline_unbiased_claim": "0 of 98 baseline traces match the unbiased-claim regex; not run for baseline.",
+  "top_k_heatmap": 10,
+  "source_run": "/workspace/value-leakage/runs/qwen3.5-122b-a10b_20260815_030702"
+}
