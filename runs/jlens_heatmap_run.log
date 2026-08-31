@@ -1,0 +1,88 @@
+Failed to load /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_cutlass_90a.abi3.so: Could not load this library: /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_cutlass_90a.abi3.so
+Failed to load /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so: Could not load this library: /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so
+Loading tokenizer + model ...
+Loading weights:   0%|          | 0/1227 [00:00<?, ?it/s]Loading weights:   1%|▏         | 16/1227 [00:04<05:30,  3.66it/s]Loading weights:   1%|▏         | 18/1227 [00:04<05:02,  3.99it/s]Loading weights:   3%|▎         | 42/1227 [00:09<04:14,  4.66it/s]Loading weights:   4%|▎         | 44/1227 [00:09<04:04,  4.84it/s]Loading weights:   6%|▌         | 68/1227 [00:15<04:23,  4.40it/s]Loading weights:   6%|▌         | 71/1227 [00:15<04:03,  4.75it/s]Loading weights:   7%|▋         | 82/1227 [00:21<06:09,  3.10it/s]Loading weights:   7%|▋         | 84/1227 [00:22<05:54,  3.23it/s]Loading weights:   7%|▋         | 85/1227 [00:22<05:43,  3.33it/s]Loading weights:  10%|▉         | 118/1227 [00:27<03:43,  4.96it/s]Loading weights:  10%|▉         | 120/1227 [00:27<03:36,  5.11it/s]Loading weights:  12%|█▏        | 144/1227 [00:33<03:50,  4.69it/s]Loading weights:  12%|█▏        | 146/1227 [00:33<03:43,  4.84it/s]Loading weights:  14%|█▍        | 170/1227 [00:38<03:48,  4.63it/s]Loading weights:  14%|█▍        | 173/1227 [00:38<03:32,  4.96it/s]Loading weights:  15%|█▍        | 184/1227 [00:44<04:55,  3.53it/s]Loading weights:  15%|█▌        | 186/1227 [00:44<04:44,  3.66it/s]Loading weights:  18%|█▊        | 220/1227 [00:49<03:22,  4.97it/s]Loading weights:  18%|█▊        | 222/1227 [00:50<03:18,  5.07it/s]Loading weights:  20%|██        | 246/1227 [00:55<03:19,  4.91it/s]Loading weights:  20%|██        | 248/1227 [00:55<03:15,  5.01it/s]Loading weights:  22%|██▏       | 272/1227 [01:00<03:13,  4.93it/s]Loading weights:  22%|██▏       | 275/1227 [01:00<03:01,  5.24it/s]Loading weights:  23%|██▎       | 286/1227 [01:06<04:26,  3.54it/s]Loading weights:  23%|██▎       | 288/1227 [01:06<04:15,  3.67it/s]Loading weights:  26%|██▌       | 322/1227 [01:11<02:58,  5.07it/s]Loading weights:  26%|██▋       | 324/1227 [01:11<02:53,  5.21it/s]Loading weights:  28%|██▊       | 348/1227 [01:16<02:57,  4.96it/s]Loading weights:  29%|██▊       | 350/1227 [01:17<02:51,  5.10it/s]Loading weights:  30%|███       | 374/1227 [01:22<02:50,  4.99it/s]Loading weights:  31%|███       | 377/1227 [01:22<02:40,  5.31it/s]Loading weights:  32%|███▏      | 388/1227 [01:26<03:36,  3.87it/s]Loading weights:  32%|███▏      | 390/1227 [01:27<03:30,  3.97it/s]Loading weights:  35%|███▍      | 424/1227 [01:32<02:27,  5.45it/s]Loading weights:  35%|███▍      | 426/1227 [01:32<02:23,  5.59it/s]Loading weights:  37%|███▋      | 450/1227 [01:37<02:26,  5.30it/s]Loading weights:  37%|███▋      | 452/1227 [01:37<02:22,  5.46it/s]Loading weights:  39%|███▉      | 476/1227 [01:42<02:34,  4.85it/s]Loading weights:  39%|███▉      | 479/1227 [01:43<02:25,  5.15it/s]Loading weights:  40%|███▉      | 490/1227 [01:48<03:23,  3.62it/s]Loading weights:  40%|████      | 492/1227 [01:48<03:15,  3.77it/s]Loading weights:  40%|████      | 493/1227 [01:48<03:09,  3.88it/s]Loading weights:  43%|████▎     | 526/1227 [01:53<02:05,  5.58it/s]Loading weights:  43%|████▎     | 528/1227 [01:53<02:01,  5.75it/s]Loading weights:  45%|████▍     | 552/1227 [01:58<02:09,  5.22it/s]Loading weights:  45%|████▌     | 554/1227 [01:58<02:05,  5.37it/s]Loading weights:  47%|████▋     | 578/1227 [02:04<02:11,  4.95it/s]Loading weights:  47%|████▋     | 581/1227 [02:04<02:02,  5.27it/s]Loading weights:  48%|████▊     | 592/1227 [02:08<02:45,  3.83it/s]Loading weights:  48%|████▊     | 594/1227 [02:08<02:35,  4.07it/s]Loading weights:  49%|████▊     | 596/1227 [02:09<02:26,  4.31it/s]Loading weights:  51%|█████     | 628/1227 [02:14<01:50,  5.43it/s]Loading weights:  51%|█████▏    | 630/1227 [02:14<01:46,  5.61it/s]Loading weights:  53%|█████▎    | 654/1227 [02:19<01:50,  5.17it/s]Loading weights:  53%|█████▎    | 656/1227 [02:19<01:47,  5.31it/s]Loading weights:  55%|█████▌    | 680/1227 [02:25<01:53,  4.84it/s]Loading weights:  56%|█████▌    | 683/1227 [02:25<01:45,  5.14it/s]Loading weights:  57%|█████▋    | 694/1227 [02:30<02:24,  3.70it/s]Loading weights:  57%|█████▋    | 696/1227 [02:30<02:18,  3.85it/s]Loading weights:  59%|█████▉    | 730/1227 [02:35<01:37,  5.11it/s]Loading weights:  60%|█████▉    | 732/1227 [02:36<01:34,  5.23it/s]Loading weights:  62%|██████▏   | 756/1227 [02:41<01:33,  5.01it/s]Loading weights:  62%|██████▏   | 758/1227 [02:41<01:30,  5.16it/s]Loading weights:  64%|██████▎   | 782/1227 [02:46<01:27,  5.08it/s]Loading weights:  64%|██████▍   | 785/1227 [02:46<01:21,  5.41it/s]Loading weights:  65%|██████▍   | 796/1227 [02:51<01:51,  3.88it/s]Loading weights:  65%|██████▌   | 798/1227 [02:51<01:46,  4.03it/s]Loading weights:  68%|██████▊   | 832/1227 [02:56<01:14,  5.31it/s]Loading weights:  68%|██████▊   | 834/1227 [02:56<01:11,  5.47it/s]Loading weights:  70%|██████▉   | 858/1227 [03:01<01:10,  5.21it/s]Loading weights:  70%|███████   | 860/1227 [03:01<01:08,  5.35it/s]Loading weights:  72%|███████▏  | 884/1227 [03:06<01:08,  5.01it/s]Loading weights:  72%|███████▏  | 887/1227 [03:07<01:04,  5.31it/s]Loading weights:  73%|███████▎  | 898/1227 [03:11<01:25,  3.83it/s]Loading weights:  73%|███████▎  | 900/1227 [03:12<01:22,  3.98it/s]Loading weights:  73%|███████▎  | 901/1227 [03:12<01:19,  4.10it/s]Loading weights:  76%|███████▌  | 934/1227 [03:17<00:53,  5.43it/s]Loading weights:  76%|███████▋  | 936/1227 [03:17<00:52,  5.58it/s]Loading weights:  78%|███████▊  | 960/1227 [03:22<00:50,  5.26it/s]Loading weights:  78%|███████▊  | 962/1227 [03:22<00:49,  5.41it/s]Loading weights:  80%|████████  | 986/1227 [03:27<00:48,  5.00it/s]Loading weights:  81%|████████  | 989/1227 [03:27<00:44,  5.34it/s]Loading weights:  81%|████████▏ | 1000/1227 [03:33<01:01,  3.70it/s]Loading weights:  82%|████████▏ | 1002/1227 [03:33<00:58,  3.85it/s]Loading weights:  84%|████████▍ | 1036/1227 [03:38<00:37,  5.11it/s]Loading weights:  85%|████████▍ | 1038/1227 [03:38<00:36,  5.22it/s]Loading weights:  87%|████████▋ | 1062/1227 [03:44<00:35,  4.59it/s]Loading weights:  87%|████████▋ | 1064/1227 [03:45<00:34,  4.73it/s]Loading weights:  89%|████████▊ | 1088/1227 [03:50<00:30,  4.51it/s]Loading weights:  89%|████████▉ | 1091/1227 [03:50<00:28,  4.78it/s]Loading weights:  90%|████████▉ | 1102/1227 [03:55<00:35,  3.52it/s]Loading weights:  90%|████████▉ | 1104/1227 [03:56<00:33,  3.65it/s]Loading weights:  93%|█████████▎| 1138/1227 [04:02<00:18,  4.79it/s]Loading weights:  93%|█████████▎| 1140/1227 [04:02<00:17,  4.91it/s]Loading weights:  95%|█████████▍| 1164/1227 [04:08<00:13,  4.53it/s]Loading weights:  95%|█████████▌| 1166/1227 [04:08<00:13,  4.67it/s]Loading weights:  97%|█████████▋| 1190/1227 [04:14<00:08,  4.39it/s]Loading weights:  97%|█████████▋| 1193/1227 [04:14<00:07,  4.67it/s]Loading weights:  98%|█████████▊| 1204/1227 [04:19<00:06,  3.46it/s]Loading weights:  98%|█████████▊| 1206/1227 [04:19<00:05,  3.66it/s]Loading weights: 100%|██████████| 1227/1227 [04:19<00:00,  4.73it/s]
+Model loaded: HFLensModel(Qwen3_5MoeForCausalLM, n_layers=48, d_model=3072)
+Lens loaded: JacobianLens(d_model=3072, n_prompts=25, source_layers=[0..46] (47 layers))
+Traceback (most recent call last):
+  File "/workspace/value-leakage/src/value_leakage/jlens_heatmap.py", line 233, in <module>
+    main()
+  File "/workspace/value-leakage/src/value_leakage/jlens_heatmap.py", line 189, in main
+    lens_logits, model_logits, _ = lens.apply(model, prompt, positions=[-2])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/jacobian-lens/jlens/lens.py", line 200, in apply
+    model.forward(input_ids)
+  File "/workspace/jacobian-lens/jlens/hf.py", line 164, in forward
+    return self._text_module(input_ids=input_ids, use_cache=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 1068, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 262, in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5_moe/modeling_qwen3_5_moe.py", line 1311, in forward
+    hidden_states = decoder_layer(
+                    ^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/modeling_layers.py", line 114, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1885, in _call_impl
+    return inner()
+           ^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1833, in inner
+    result = forward_call(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5_moe/modeling_qwen3_5_moe.py", line 852, in forward
+    hidden_states = self.linear_attn(
+                    ^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/accelerate.py", line 1010, in wrapped
+    output = forward_func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5_moe/modeling_qwen3_5_moe.py", line 446, in forward
+    mixed_qkv = self.in_proj_qkv(hidden_states)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/finegrained_fp8.py", line 338, in forward
+    return fp8_linear(
+           ^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 171, in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/finegrained_fp8.py", line 287, in fp8_linear
+    return finegrained_fp8_linear(input, weight, weight_scale_inv, block_size, bias, activation_scale)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/utils/deprecation.py", line 171, in wrapped_func
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/finegrained_fp8.py", line 197, in finegrained_fp8_linear
+    finegrained_fp8 = load_finegrained_fp8_kernel()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/finegrained_fp8.py", line 143, in load_finegrained_fp8_kernel
+    _load_finegrained_fp8_kernel()
+  File "/workspace/value-leakage/.venv/lib/python3.12/site-packages/transformers/integrations/finegrained_fp8.py", line 108, in _load_finegrained_fp8_kernel
+    raise ImportError(f"finegrained-fp8 kernel unavailable: {_MISSING_KERNELS_MESSAGE}")
+ImportError: finegrained-fp8 kernel unavailable: `kernels` is either not installed or uses an incompatible version. Please install a compatible version (0.16.0 <= version < 0.17.0), e.g. `pip install kernels==0.16.0`

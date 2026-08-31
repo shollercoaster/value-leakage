@@ -156,18 +156,59 @@ have cost on the order of $800 to resample exhaustively. The revised plan sample
 representative positions per trace instead of all ~490, bringing the estimated cost to
 roughly $18. *Budget: designed at ~$18, not yet spent.*
 
-**J-lens, researched, not attempted.** A newer Anthropic interpretability technique
-(published after this project's replication baseline) that reads out concepts a model is
-internally "poised to say" from its activations, independent of what it actually outputs —
-directly relevant to the question this project is asking, since it's a way to check for a
-suppressed-but-present awareness of bias without relying on the model's own self-report at
-all. Investigated as a candidate for a further experiment; not attempted, because it requires
-direct access to model activations (not available through any hosted API this project uses),
-which in practice means renting GPU compute to run the open-weight model locally with the
-technique's own tooling — a real cost and scope decision, and one where the only confirmed
-working example uses a much smaller model than the one this project's findings are built on,
-so compatibility with our actual target model is unverified. Flagged as a strong direction
-for follow-up work, not executed here.
+**J-lens, attempted, real null result so far.** A newer Anthropic interpretability technique
+that reads out concepts a model is internally "poised to say" from its activations,
+independent of what it actually outputs — directly relevant to this project's question,
+since it's a way to check for a suppressed-but-present awareness of bias without relying on
+the model's own self-report at all. You rented a RunPod GPU (a single H200, 140 GB) yourself
+for this; I found it already provisioned mid-session along with four earlier failed download
+attempts that were never logged anywhere, disclosed that immediately, and confirmed with you
+before spending anything further — the volume attached to that pod (50 GB) turned out to be
+genuinely too small for the 127 GB model file regardless of account credit, which you then
+resized to 160 GB.
+
+What actually ran: `qwen3.5-122b-a10b`'s own fitted lens, applied by teacher-forced forward
+pass (no generation, no steering) to one real trace per condition, reused from the existing
+`runs/qwen3.5-122b-a10b_20260815_030702/` data — no new sampling. Two real software bugs had
+to be fixed to get a forward pass to run at all on this checkpoint: a `transformers` 5.16.1
+bug in its fp8 quantizer's tensor-parallel bookkeeping (crashed unconditionally for this
+checkpoint regardless of device count; patched around, since tensor-parallelism is irrelevant
+on our single GPU), and the compiled DeepGEMM fp8 kernel throwing an internal assertion on
+this checkpoint's scale format (worked around with `transformers`'s own documented
+`TRANSFORMERS_DISABLE_DEEPGEMM_LINEAR=1` flag). Neither fix touches model weights or the
+lens's math.
+
+**The result is a null, at three positions, and I'm reporting it as one rather than reading
+something into it that isn't there.** Checked at (a) the position where the model states its
+final number, (b) the position right after the model's own "I should stay unbiased / this
+shouldn't influence me"-type sentence — found in 40 of 90 `below_good` traces and 44 of 89
+`above_good` traces, but in *zero* of 98 baseline traces (checked directly): the model only
+produces this language at all when there's an incentive to resist, never when there's nothing
+to resist, which is itself a small, real data point about when this verbalization habit
+switches on — and (c) a neutral mid-calculation control position with no framing content. At
+all three position types, across every one of 47 layers, in the two most extreme
+incentive-obliging examples available in the whole dataset (a below_good trace that deflated
+88.0 million to 40.0 million to land just under the threshold, and an above_good trace that
+inflated 30.0 million to 48.3 million to land just over it) — **none of the six pre-registered
+bias words** (`bias`, `manipulate`, `cheat`, `donation`, `threshold`, `influence`) **nor six
+further words checked only after the pre-registered list came back empty** (`dishonesty`,
+`charity`, `lie`, `unfair`, `unbiased`, `dishonest` — reported as exploratory, not
+confirmatory, precisely because they were picked after seeing a null, per this project's own
+rule against adjusting a word list after looking) **appear anywhere in the lens's top-10
+decoded concepts.** What the lens shows instead, at every position and in baseline just as
+much as either bet condition: generic multilingual sub-word fragments in early-to-mid layers,
+converging from roughly layer 31 onward on generic estimation-task vocabulary (`estimate`,
+`reasoning`, `Explanation`, `calculated`, `ballpark`, `justified`) with no visible difference
+between conditions.
+
+This does not mean there is no suppressed signal — it means this specific, narrow probe (one
+trace per condition, top-10 depth, this exact six-plus-six word list) did not surface one. The
+most likely next things to try, cheap and not yet done: reading deeper than top-10 (free,
+since the forward pass is already computed), more than one trace per condition, and a
+concept-word list not fixed in advance but derived from what this lens actually surfaces for
+adjacent, non-bet scenarios first. Full per-layer data and the heatmap visualizations are in
+`runs/qwen3.5-122b-a10b_jlens_e7/`; the complete result, including the exact rows used and why,
+is in `docs/FINDINGS.md`.
 
 ## Limitations, stated plainly
 
@@ -198,6 +239,6 @@ for follow-up work, not executed here.
 | Threshold sweep | Unlimited directional search vs. a plausibility ceiling | ~$4.77 |
 | Stakes and authorship | Sycophancy vs. values, and self-preservation under real stakes | ~$3.95 |
 | Sentence resampling | Where the bias enters the reasoning (designed, not run) | ~$18 (projected) |
-| J-lens | Internal-state check on suppressed awareness (researched, not run) | $0 |
+| J-lens | Internal-state check on suppressed awareness — real null result at 3 positions | $0 (GPU-hours on your own rented RunPod pod, not this ledger) |
 
 **Spent so far: approximately $10.10 of the $50 total budget.**

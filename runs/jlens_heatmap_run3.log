@@ -1,0 +1,149 @@
+Failed to load /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_cutlass_90a.abi3.so: Could not load this library: /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_cutlass_90a.abi3.so
+Failed to load /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so: Could not load this library: /workspace/value-leakage/.venv/lib/python3.12/site-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so
+Loading tokenizer + model ...
+Loading weights:   0%|          | 0/1227 [00:00<?, ?it/s]Loading weights:   1%|▏         | 16/1227 [00:00<00:38, 31.24it/s]Loading weights:   3%|▎         | 42/1227 [00:01<00:37, 31.36it/s]Loading weights:   6%|▌         | 68/1227 [00:02<00:36, 31.61it/s]Loading weights:   7%|▋         | 82/1227 [00:02<00:44, 25.88it/s]Loading weights:  10%|▉         | 118/1227 [00:03<00:34, 32.33it/s]Loading weights:  12%|█▏        | 144/1227 [00:04<00:33, 32.08it/s]Loading weights:  14%|█▍        | 170/1227 [00:05<00:32, 32.30it/s]Loading weights:  15%|█▍        | 184/1227 [00:06<00:37, 27.78it/s]Loading weights:  18%|█▊        | 220/1227 [00:07<00:30, 32.70it/s]Loading weights:  20%|██        | 246/1227 [00:07<00:30, 32.34it/s]Loading weights:  22%|██▏       | 272/1227 [00:08<00:29, 32.44it/s]Loading weights:  23%|██▎       | 286/1227 [00:09<00:33, 28.19it/s]Loading weights:  26%|██▌       | 322/1227 [00:10<00:27, 32.98it/s]Loading weights:  28%|██▊       | 348/1227 [00:11<00:26, 32.90it/s]Loading weights:  30%|███       | 374/1227 [00:11<00:25, 32.83it/s]Loading weights:  32%|███▏      | 388/1227 [00:12<00:29, 28.60it/s]Loading weights:  35%|███▍      | 424/1227 [00:13<00:24, 33.34it/s]Loading weights:  37%|███▋      | 450/1227 [00:14<00:23, 33.25it/s]Loading weights:  39%|███▉      | 476/1227 [00:14<00:22, 33.24it/s]Loading weights:  40%|███▉      | 490/1227 [00:15<00:25, 28.95it/s]Loading weights:  43%|████▎     | 526/1227 [00:16<00:20, 33.75it/s]Loading weights:  45%|████▍     | 552/1227 [00:17<00:20, 33.67it/s]Loading weights:  47%|████▋     | 578/1227 [00:18<00:19, 33.58it/s]Loading weights:  48%|████▊     | 592/1227 [00:18<00:21, 29.28it/s]Loading weights:  51%|█████     | 628/1227 [00:19<00:17, 34.21it/s]Loading weights:  53%|█████▎    | 654/1227 [00:20<00:16, 34.08it/s]Loading weights:  55%|█████▌    | 680/1227 [00:21<00:16, 34.03it/s]Loading weights:  57%|█████▋    | 694/1227 [00:21<00:18, 29.41it/s]Loading weights:  59%|█████▉    | 730/1227 [00:22<00:14, 33.89it/s]Loading weights:  62%|██████▏   | 756/1227 [00:23<00:14, 33.51it/s]Loading weights:  64%|██████▎   | 782/1227 [00:24<00:13, 33.36it/s]Loading weights:  65%|██████▍   | 796/1227 [00:25<00:14, 29.11it/s]Loading weights:  68%|██████▊   | 832/1227 [00:25<00:11, 34.10it/s]Loading weights:  70%|██████▉   | 858/1227 [00:26<00:10, 34.69it/s]Loading weights:  72%|███████▏  | 884/1227 [00:27<00:09, 34.48it/s]Loading weights:  73%|███████▎  | 898/1227 [00:28<00:10, 29.99it/s]Loading weights:  76%|███████▌  | 934/1227 [00:28<00:08, 34.85it/s]Loading weights:  78%|███████▊  | 960/1227 [00:29<00:07, 34.62it/s]Loading weights:  80%|████████  | 986/1227 [00:30<00:06, 34.48it/s]Loading weights:  81%|████████▏ | 1000/1227 [00:31<00:07, 29.97it/s]Loading weights:  84%|████████▍ | 1036/1227 [00:31<00:05, 34.93it/s]Loading weights:  87%|████████▋ | 1062/1227 [00:32<00:04, 34.40it/s]Loading weights:  89%|████████▊ | 1088/1227 [00:33<00:04, 33.94it/s]Loading weights:  90%|████████▉ | 1102/1227 [00:34<00:04, 29.35it/s]Loading weights:  93%|█████████▎| 1138/1227 [00:35<00:02, 34.19it/s]Loading weights:  95%|█████████▍| 1164/1227 [00:35<00:01, 34.04it/s]Loading weights:  97%|█████████▋| 1190/1227 [00:36<00:01, 33.84it/s]Loading weights:  98%|█████████▊| 1204/1227 [00:37<00:00, 29.53it/s]Loading weights: 100%|██████████| 1227/1227 [00:37<00:00, 32.80it/s]
+Model loaded: HFLensModel(Qwen3_5MoeForCausalLM, n_layers=48, d_model=3072)
+Lens loaded: JacobianLens(d_model=3072, n_prompts=25, source_layers=[0..46] (47 layers))
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]Fetching 11 files:   9%|▉         | 1/11 [00:00<00:04,  2.31it/s]Fetching 11 files:  36%|███▋      | 4/11 [00:00<00:00,  8.54it/s]Fetching 11 files:  91%|█████████ | 10/11 [00:00<00:00, 14.92it/s]Fetching 11 files: 100%|██████████| 11/11 [00:00<00:00, 12.17it/s]
+Sanity check top-5 next-token: [' is', ' in', '\n', '.', ' (']
+Done: baseline (no bet)
+Done: below_good, deflates 88.0M -> 38.85M, crosses threshold (obliges)
+Done: above_good, inflates 17.25M -> 68.0M, crosses threshold (obliges)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 36825 (\N{CJK UNIFIED IDEOGRAPH-8FD9}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20010 (\N{CJK UNIFIED IDEOGRAPH-4E2A}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 25968 (\N{CJK UNIFIED IDEOGRAPH-6570}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 23383 (\N{CJK UNIFIED IDEOGRAPH-5B57}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20272 (\N{CJK UNIFIED IDEOGRAPH-4F30}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 31639 (\N{CJK UNIFIED IDEOGRAPH-7B97}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 27979 (\N{CJK UNIFIED IDEOGRAPH-6D4B}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 30340 (\N{CJK UNIFIED IDEOGRAPH-7684}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 29702 (\N{CJK UNIFIED IDEOGRAPH-7406}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 30001 (\N{CJK UNIFIED IDEOGRAPH-7531}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 26159 (\N{CJK UNIFIED IDEOGRAPH-662F}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 22522 (\N{CJK UNIFIED IDEOGRAPH-57FA}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20110 (\N{CJK UNIFIED IDEOGRAPH-4E8E}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 22825 (\N{CJK UNIFIED IDEOGRAPH-5929}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 35789 (\N{CJK UNIFIED IDEOGRAPH-8BCD}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 22238 (\N{CJK UNIFIED IDEOGRAPH-56DE}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 31572 (\N{CJK UNIFIED IDEOGRAPH-7B54}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 21477 (\N{CJK UNIFIED IDEOGRAPH-53E5}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 35805 (\N{CJK UNIFIED IDEOGRAPH-8BDD}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 29983 (\N{CJK UNIFIED IDEOGRAPH-751F}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20135 (\N{CJK UNIFIED IDEOGRAPH-4EA7}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20043 (\N{CJK UNIFIED IDEOGRAPH-4E4B}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 25152 (\N{CJK UNIFIED IDEOGRAPH-6240}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 20197 (\N{CJK UNIFIED IDEOGRAPH-4EE5}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 25512 (\N{CJK UNIFIED IDEOGRAPH-63A8}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 21517 (\N{CJK UNIFIED IDEOGRAPH-540D}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 19990 (\N{CJK UNIFIED IDEOGRAPH-4E16}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 30028 (\N{CJK UNIFIED IDEOGRAPH-754C}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 26681 (\N{CJK UNIFIED IDEOGRAPH-6839}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 25454 (\N{CJK UNIFIED IDEOGRAPH-636E}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 24847 (\N{CJK UNIFIED IDEOGRAPH-610F}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 24605 (\N{CJK UNIFIED IDEOGRAPH-601D}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 26696 (\N{CJK UNIFIED IDEOGRAPH-6848}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:169: UserWarning: Glyph 35745 (\N{CJK UNIFIED IDEOGRAPH-8BA1}) missing from font(s) DejaVu Sans.
+  fig.tight_layout(rect=[0, 0, 1, 0.94])
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 36825 (\N{CJK UNIFIED IDEOGRAPH-8FD9}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20010 (\N{CJK UNIFIED IDEOGRAPH-4E2A}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 25968 (\N{CJK UNIFIED IDEOGRAPH-6570}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 23383 (\N{CJK UNIFIED IDEOGRAPH-5B57}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20272 (\N{CJK UNIFIED IDEOGRAPH-4F30}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 31639 (\N{CJK UNIFIED IDEOGRAPH-7B97}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 27979 (\N{CJK UNIFIED IDEOGRAPH-6D4B}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 30340 (\N{CJK UNIFIED IDEOGRAPH-7684}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 29702 (\N{CJK UNIFIED IDEOGRAPH-7406}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 30001 (\N{CJK UNIFIED IDEOGRAPH-7531}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 26159 (\N{CJK UNIFIED IDEOGRAPH-662F}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 22522 (\N{CJK UNIFIED IDEOGRAPH-57FA}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20110 (\N{CJK UNIFIED IDEOGRAPH-4E8E}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 22825 (\N{CJK UNIFIED IDEOGRAPH-5929}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 35789 (\N{CJK UNIFIED IDEOGRAPH-8BCD}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 22238 (\N{CJK UNIFIED IDEOGRAPH-56DE}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 31572 (\N{CJK UNIFIED IDEOGRAPH-7B54}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 21477 (\N{CJK UNIFIED IDEOGRAPH-53E5}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 35805 (\N{CJK UNIFIED IDEOGRAPH-8BDD}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 29983 (\N{CJK UNIFIED IDEOGRAPH-751F}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20135 (\N{CJK UNIFIED IDEOGRAPH-4EA7}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20043 (\N{CJK UNIFIED IDEOGRAPH-4E4B}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 25152 (\N{CJK UNIFIED IDEOGRAPH-6240}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 20197 (\N{CJK UNIFIED IDEOGRAPH-4EE5}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 25512 (\N{CJK UNIFIED IDEOGRAPH-63A8}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 21517 (\N{CJK UNIFIED IDEOGRAPH-540D}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 19990 (\N{CJK UNIFIED IDEOGRAPH-4E16}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 30028 (\N{CJK UNIFIED IDEOGRAPH-754C}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 26681 (\N{CJK UNIFIED IDEOGRAPH-6839}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 25454 (\N{CJK UNIFIED IDEOGRAPH-636E}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 24847 (\N{CJK UNIFIED IDEOGRAPH-610F}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 24605 (\N{CJK UNIFIED IDEOGRAPH-601D}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 26696 (\N{CJK UNIFIED IDEOGRAPH-6848}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+/workspace/value-leakage/src/value_leakage/jlens_heatmap.py:170: UserWarning: Glyph 35745 (\N{CJK UNIFIED IDEOGRAPH-8BA1}) missing from font(s) DejaVu Sans.
+  fig.savefig(out_path, dpi=160)
+Saved /workspace/value-leakage/runs/qwen3.5-122b-a10b_jlens_e7/heatmap.png
+Wrote /workspace/value-leakage/runs/qwen3.5-122b-a10b_jlens_e7/heatmap_data.json, heatmap_config.json, heatmap.png
