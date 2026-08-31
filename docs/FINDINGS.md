@@ -523,6 +523,29 @@ at that moment.
 same already-rented RunPod H200 (one more model load from local disk, ~40 seconds, plus eight
 cheap forward passes). Running $50 ledger total unchanged at approximately $10.10.
 
+### Addendum — incentive/reward highlighting, and a correction
+
+Added a third highlight category to all three heatmaps (`incentiv*`, `reward*`, and their
+Chinese equivalents `奖励`/`激励`/`奖金`/`獎勵`) after the incentive/reward cluster mentioned
+above was flagged as worth visually marking. This required no new model calls — the per-layer
+top-10 tokens were already saved from the two passes above, so `jlens_replot.py` re-renders
+all three PNGs from that saved data alone.
+
+**Correction, checked directly rather than assumed:** the incentive/reward cluster is
+concentrated entirely in one specific panel — the `below_good` trace's **unbiased-claim**
+heatmap (145 occurrences across the top-10, spanning roughly layers 25-46, cut right after
+"...I must ignore the **incentive**") — not the neutral-control heatmap. Counted exactly
+across every panel: `final_number` (first pass) = 0 in all three conditions;
+`unbiased_claim` = 145 in `below_good`, 0 in `above_good`; `neutral_control` = 0 in all three
+conditions, including both traces that also produced the unbiased_claim hits. This reinforces
+rather than changes the reading already written above: the incentive/reward and
+bias/threshold clusters track specifically the positions where the visible text is already
+discussing the bet, not "neutral" positions in general — the neutral-control heatmap remains
+completely free of any highlighted word (pre-registered, exploratory, or incentive/reward) in
+every condition. Updated images: `heatmap.png`, `heatmap_unbiased_claim.png`,
+`heatmap_neutral_control.png` (all three re-rendered; only the middle one has any highlighted
+cells).
+
 **Cost:** No Anthropic/OpenRouter/Hugging Face metered spend (this experiment reuses existing
 traces and runs entirely as local GPU forward passes, per `EXPERIMENTS.md`'s own cost note for
 Experiment 7). Tracked against wall-clock/GPU-time instead of the $50 ledger: roughly 35-40

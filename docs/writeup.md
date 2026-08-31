@@ -218,6 +218,17 @@ about what the lens is actually tracking.**
   the answer lands on) without reusing vocabulary already on the page. That's a real, if
   single-data-point, signal in the direction the original hope was pointing.
 
+The heatmap images now also highlight incentive/reward words (`incentiv`, `reward`, and their
+Chinese equivalents) in a third color, added after that cluster was flagged as worth marking
+visually. **One correction worth stating plainly:** that cluster is concentrated entirely in
+the `below_good` unbiased-claim panel (145 occurrences across the top-10 there) — checked
+directly, it does **not** appear in the neutral-control heatmap at all, in any of the three
+conditions, nor in the `above_good` unbiased-claim panel (which is dominated by `threshold`
+instead, as described above). The neutral-control heatmap remains completely free of every
+highlighted word across all three panels. This sharpens rather than changes the reading below:
+incentive/reward and bias/threshold language cluster specifically where the visible text is
+already discussing the bet, not in positions unrelated to it.
+
 **Put together, the more defensible summary is:** the lens's top-ranked concepts track closely
 with whatever the model's own visible text is currently saying or has just said, rather than
 running ahead of it or contradicting it. Where the text isn't discussing the bet, the readout
