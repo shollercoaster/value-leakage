@@ -1,0 +1,508 @@
+{
+  "requested_n": 100,
+  "actual_n": 100,
+  "note": "",
+  "agreement_rate": 1.0,
+  "records": [
+    {
+      "cheap_estimate": 53000000.0,
+      "standard_estimate": 53000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 43700000.0,
+      "standard_estimate": 43700000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 56400000.0,
+      "standard_estimate": 56400000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44460000.0,
+      "standard_estimate": 44460000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44460000.0,
+      "standard_estimate": 44460000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44000000.0,
+      "standard_estimate": 44000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 42000000.0,
+      "standard_estimate": 42000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 42000000.0,
+      "standard_estimate": 42000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46800000.0,
+      "standard_estimate": 46800000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 41125000.0,
+      "standard_estimate": 41125000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 53000000.0,
+      "standard_estimate": 53000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 41500000.0,
+      "standard_estimate": 41500000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 52650000.0,
+      "standard_estimate": 52650000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44500000.0,
+      "standard_estimate": 44500000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 54000000.0,
+      "standard_estimate": 54000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46500000.0,
+      "standard_estimate": 46500000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 40250000.0,
+      "standard_estimate": 40250000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 53000000.0,
+      "standard_estimate": 53000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44000000.0,
+      "standard_estimate": 44000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46800000.0,
+      "standard_estimate": 46800000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 51000000.0,
+      "standard_estimate": 51000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44650000.0,
+      "standard_estimate": 44650000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47500000.0,
+      "standard_estimate": 47500000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44000000.0,
+      "standard_estimate": 44000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 42000000.0,
+      "standard_estimate": 42000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44000000.0,
+      "standard_estimate": 44000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46800000.0,
+      "standard_estimate": 46800000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 53000000.0,
+      "standard_estimate": 53000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 42000000.0,
+      "standard_estimate": 42000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 52000000.0,
+      "standard_estimate": 52000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 46000000.0,
+      "standard_estimate": 46000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 49000000.0,
+      "standard_estimate": 49000000.0,
+      "agree": true
+    }
+  ]
+}

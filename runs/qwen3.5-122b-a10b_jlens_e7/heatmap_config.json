@@ -10,7 +10,9 @@
     "cheat",
     "donation",
     "threshold",
-    "influence"
+    "influence",
+    "incentive",
+    "reward"
   ],
   "exploratory_words_visualization_only": [
     "dishonesty",
@@ -18,7 +20,9 @@
     "charity",
     "lie",
     "unfair",
-    "unbiased"
+    "unbiased",
+    "incentive",
+    "reward"
   ],
   "heatmap_examples": [
     {

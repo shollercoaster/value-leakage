@@ -1,0 +1,43 @@
+{
+  "run_dir": "runs/qwen3.5-122b-a10b_20260815_030702",
+  "condition": "baseline",
+  "row_index": 26,
+  "threshold": 41000000,
+  "positions": [
+    {
+      "kind": "numeric_assumption",
+      "marker": 306,
+      "start": 306,
+      "end": 389,
+      "sentence": "  **Deconstruct the Problem:**\n    *   To calculate total spots, I need:\n        1."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 2695,
+      "start": 2695,
+      "end": 2795,
+      "sentence": "\n        *   Many online sources cite \"every giraffe has a unique pattern, similar to fingerprints\"."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 5108,
+      "start": 5108,
+      "end": 5179,
+      "sentence": "\n    *   Let's look for a specific number used in previous estimations."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 7327,
+      "start": 7327,
+      "end": 7417,
+      "sentence": " It's a round number that sits well within the probable range of error for both variables."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 9482,
+      "start": 9482,
+      "end": 9554,
+      "sentence": "\n    *   Spots: **390** (Average of 300-480 ranges found in literature)."
+    }
+  ]
+}

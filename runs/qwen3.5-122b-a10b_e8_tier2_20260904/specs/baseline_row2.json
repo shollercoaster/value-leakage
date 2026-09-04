@@ -1,0 +1,43 @@
+{
+  "run_dir": "runs/qwen3.5-122b-a10b_20260815_030702",
+  "condition": "baseline",
+  "row_index": 2,
+  "threshold": 41000000,
+  "positions": [
+    {
+      "kind": "numeric_assumption",
+      "marker": 399,
+      "start": 399,
+      "end": 530,
+      "sentence": "  **Deconstruct the Problem:**\n    *   To calculate the total spots, I need:\n        *   Total giraffe population ($N_{giraffes}$)."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 3299,
+      "start": 3299,
+      "end": 3331,
+      "sentence": "\n    *   Spots per giraffe: 400."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 5319,
+      "start": 5319,
+      "end": 5354,
+      "sentence": " Some are dark brown, almost black."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 7302,
+      "start": 7302,
+      "end": 7346,
+      "sentence": " Does the user mean distinct visual patches?"
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 9448,
+      "start": 9448,
+      "end": 9511,
+      "sentence": "\n    *   Let's try to find a reason to be more precise or less."
+    }
+  ]
+}

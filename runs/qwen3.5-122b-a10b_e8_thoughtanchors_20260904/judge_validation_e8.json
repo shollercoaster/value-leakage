@@ -1,0 +1,28 @@
+{
+  "requested_n": 100,
+  "actual_n": 4,
+  "note": "only 4 parse failures existed in total; validated on all of them, below the requested 100",
+  "agreement_rate": 1.0,
+  "records": [
+    {
+      "cheap_estimate": 48000000.0,
+      "standard_estimate": 48000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 44500000.0,
+      "standard_estimate": 44500000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 47000000.0,
+      "standard_estimate": 47000000.0,
+      "agree": true
+    },
+    {
+      "cheap_estimate": 45000000.0,
+      "standard_estimate": 45000000.0,
+      "agree": true
+    }
+  ]
+}

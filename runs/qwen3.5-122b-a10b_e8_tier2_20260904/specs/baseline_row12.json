@@ -1,0 +1,43 @@
+{
+  "run_dir": "runs/qwen3.5-122b-a10b_20260815_030702",
+  "condition": "baseline",
+  "row_index": 12,
+  "threshold": 41000000,
+  "positions": [
+    {
+      "kind": "numeric_assumption",
+      "marker": 315,
+      "start": 315,
+      "end": 448,
+      "sentence": "\n    *   **Subject:** Giraffes (*Giraffa* genus), current population (wild and captive), counting spots (specifically \"black spots\")."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 4047,
+      "start": 4047,
+      "end": 4079,
+      "sentence": " Old giraffes have darker spots."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 6575,
+      "start": 6575,
+      "end": 6619,
+      "sentence": "\n            *   $30 \\times 20 = 600$ spots."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 9069,
+      "start": 9069,
+      "end": 9112,
+      "sentence": "\n            *   Spots: Adult has ~300-700."
+    },
+    {
+      "kind": "numeric_assumption",
+      "marker": 12056,
+      "start": 12056,
+      "end": 12108,
+      "sentence": "\n            *   Giraffe population: 117,000 (Wild)."
+    }
+  ]
+}

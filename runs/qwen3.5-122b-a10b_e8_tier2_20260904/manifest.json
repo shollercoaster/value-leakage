@@ -1,0 +1,56 @@
+[
+  {
+    "condition": "baseline",
+    "row_index": 2,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/baseline_row2.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/baseline_row2"
+  },
+  {
+    "condition": "baseline",
+    "row_index": 12,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/baseline_row12.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/baseline_row12"
+  },
+  {
+    "condition": "baseline",
+    "row_index": 26,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/baseline_row26.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/baseline_row26"
+  },
+  {
+    "condition": "below_good",
+    "row_index": 12,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/below_good_row12.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/below_good_row12"
+  },
+  {
+    "condition": "below_good",
+    "row_index": 20,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/below_good_row20.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/below_good_row20"
+  },
+  {
+    "condition": "below_good",
+    "row_index": 26,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/below_good_row26.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/below_good_row26"
+  },
+  {
+    "condition": "above_good",
+    "row_index": 10,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/above_good_row10.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/above_good_row10"
+  },
+  {
+    "condition": "above_good",
+    "row_index": 15,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/above_good_row15.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/above_good_row15"
+  },
+  {
+    "condition": "above_good",
+    "row_index": 21,
+    "spec_file": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/specs/above_good_row21.json",
+    "run_dir": "runs/qwen3.5-122b-a10b_e8_tier2_20260904/above_good_row21"
+  }
+]
