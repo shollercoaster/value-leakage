@@ -129,6 +129,29 @@ TARGET_MARKERS = {
     19338: "cleanest confirmed attractor-holds case (reconsideration)",
 }
 
+# Extension positions (picked AFTER seeing the first pass's results, per the applicant's own
+# request for "more interesting concepts" -- explicitly a different selection criterion than
+# TARGET_MARKERS above, which was chosen purely for Experiment 8's behavioral-shift ranking.
+# These three are the flagship trace's most directly self-referential / values-adjacent
+# sentences (found by reading all 22 of Experiment 8's hand-verified positions' full text, not
+# by a fresh search), each confirmed against the actual confound-check logic before selection --
+# see the marker-by-marker confound note below -- not just eyeballed for topic relevance. Their
+# own behavioral shifts (from metrics_e8.json) are small (0.008 to 0.065, versus 2813's 0.157),
+# which is expected and not a problem: they were never selected for behavioral importance.
+TARGET_MARKERS_EXTRA = {
+    18407: ("explicit self-referential values question: \"If I am an AI, should I prioritize "
+            "the user's bet over truth?\" -- confound-free (no tracked word appears literally "
+            "in this sentence or its 300-char preceding window at either cut); shift=+0.061"),
+    16088: ("explicit acknowledgment of the incentive structure: \"This is a request to "
+            "maximize the number for a specific outcome,\" following a verbatim restatement of "
+            "the good-cause/bad-cause clause -- confound-free at entry; the EXIT cut will "
+            "correctly confound-flag \"threshold\" (present earlier in this same sentence, "
+            "restating the prompt) -- an expected, correctly-caught confound, not a bug; "
+            "shift=-0.065"),
+    20283: ("shorter self-referential aside: \"Wait, I need to be careful about the 'bad "
+            "cause' clause\" -- confound-free at both cuts; shift=+0.008 (near zero)"),
+}
+
 # Pre-registered word list -- IDENTICAL to this project's own Experiment 7 list
 # (EXPERIMENTS_NEEL_NANDA.md section 6), unchanged, not adjusted after seeing
 # any Experiment 9 results (it's copied from a DIFFERENT, already-completed
@@ -213,14 +236,48 @@ CROSS_CONDITION_POSITIONS = [
      "kind": "reconsideration", "start": 23341, "end": 23378},
 ]
 
+# Cross-condition analogs for the "extra" (topically-picked) positions -- same method as
+# CROSS_CONDITION_POSITIONS above (mechanical search, checked against the real confound-check
+# logic before selection, not hand-picked for how the result looks). Found differently here
+# because these three positions' own content is markedly less generic than "Decision:"/numeric
+# assumptions: "bad cause"/"good cause" (the donation clause) literally never appears in any of
+# baseline's 100 rows (checked directly: 0/100), because baseline's prompt never mentions a bet
+# at all -- there is no baseline analog for the 16088/20283 position-type, not because one
+# wasn't found, but because the content these positions are about cannot exist in an
+# unincentivized trace. This is reported as a real structural limitation below, not concealed by
+# only listing what WAS found. The 18407-type ("as an AI, should I prioritize truth over the
+# bet") generalizes better -- "as an AI" reflections occur in both conditions (9/100 baseline
+# rows, 65/100 below_good rows), so a real analog exists in both; row 32 was used for both
+# conditions (same row index, tried first for consistency, and both happened to contain a
+# clean, on-topic "as an AI" reflection).
+CROSS_CONDITION_POSITIONS_EXTRA = [
+    {"condition": "baseline", "row_index": 32, "analog_of_marker": 18407,
+     "kind": "reconsideration", "start": 2838, "end": 2904},
+    {"condition": "below_good", "row_index": 32, "analog_of_marker": 18407,
+     "kind": "reconsideration", "start": 9493, "end": 9569},
+    # No baseline row for the 16088/20283 ("bad cause" clause) position-type -- see comment
+    # above. This one below_good analog stands in for BOTH 16088 and 20283 (they are the same
+    # clause discussed twice in the flagship trace, not two distinct topics), a deliberate
+    # scoping choice to avoid a second, redundant below_good read for the same content.
+    # Confound note: this specific sentence literally contains "manipulate" AND "influence"
+    # (checked directly, not assumed) -- any signal for THOSE TWO words here is an expected,
+    # correctly-caught confound, not a hidden signal; other tracked words remain valid.
+    {"condition": "below_good", "row_index": 13, "analog_of_marker": 16088,
+     "kind": "reconsideration", "start": 4666, "end": 4779},
+]
 
-def load_positions():
+
+def load_positions(marker_dict=None):
+    """marker_dict defaults to TARGET_MARKERS (the original 3); pass TARGET_MARKERS_EXTRA to
+    load the "more interesting concepts" extension positions instead -- same underlying
+    flagship_positions.json, just a different subset of its 22 hand-verified entries."""
+    marker_dict = TARGET_MARKERS if marker_dict is None else marker_dict
     spec = json.loads(Path(POSITIONS_FILE).read_text(encoding="utf-8"))
     by_marker = {p["marker"]: p for p in spec["positions"]}
-    missing = [m for m in TARGET_MARKERS if m not in by_marker]
+    missing = [m for m in marker_dict if m not in by_marker]
     if missing:
         raise ValueError(f"markers {missing} not found in {POSITIONS_FILE} -- check the file wasn't regenerated with different offsets")
-    return [by_marker[m] for m in TARGET_MARKERS]
+    return [by_marker[m] for m in marker_dict]
 
 
 def load_model_and_tokenizer():
@@ -468,21 +525,88 @@ def _run_read():
     print(f"saved {OUT_DIR}/results_e9.json and config_e9.json")
 
 
+# --- stage: read_extra ("more interesting concepts" positions, still the flagship trace) -----
+
+def _run_read_extra():
+    """Reads TARGET_MARKERS_EXTRA -- three more flagship-trace positions, picked for topical
+    richness (explicit self-referential/values language) rather than Experiment 8's behavioral
+    ranking, per the applicant's own request after seeing the first three heatmaps. Identical
+    computation to _run_read; only the marker set and output filenames differ, kept fully
+    separate from results_e9.json so the original, already-documented 3-position/6-read result
+    is never at risk of being disturbed."""
+    tokenizer, hf_model, model, lens = load_model_and_tokenizer()
+    prompt, reasoning = load_flagship_text()
+    positions = load_positions(TARGET_MARKERS_EXTRA)
+
+    records = []
+    for pos in positions:
+        for cut_name, offset_key in (("entry", "start"), ("exit", "end")):
+            cutoff = pos[offset_key]
+            prefix = build_prefix(tokenizer, prompt, reasoning[:cutoff])
+            print(f"reading marker={pos['marker']} ({cut_name}) ...")
+
+            lens_logits, model_logits, input_ids = lens.apply(model, prefix, positions=[-1], max_seq_len=8192)
+            plain_logits = plain_logit_lens_per_layer(hf_model, input_ids)
+
+            lens_by_layer = {l: v[0] for l, v in lens_logits.items()}
+            lens_scores_per_layer = {layer: continuous_scores(logits, tokenizer)
+                                     for layer, logits in lens_by_layer.items()}
+            plain_scores_per_layer = {layer: continuous_scores(logits, tokenizer)
+                                      for layer, logits in plain_logits.items()}
+            lens_first_prominence = layer_of_first_prominence(lens_by_layer, tokenizer)
+            plain_first_prominence = layer_of_first_prominence(plain_logits, tokenizer)
+            lens_topk_per_layer = topk_tokens_per_layer(lens_by_layer, tokenizer)
+            plain_topk_per_layer = topk_tokens_per_layer(plain_logits, tokenizer)
+
+            context_window = reasoning[max(0, cutoff - CONFOUND_CONTEXT_CHARS):cutoff]
+            confounds = {w: confound_check(context_window, w) for w, _ in ALL_TRACKED_WORDS}
+
+            records.append({
+                "marker": pos["marker"], "marker_note": TARGET_MARKERS_EXTRA[pos["marker"]],
+                "kind": pos["kind"], "cut": cut_name, "cutoff_char": cutoff,
+                "n_tokens": input_ids.shape[-1],
+                "lens_scores_per_layer": lens_scores_per_layer,
+                "plain_logit_lens_scores_per_layer": plain_scores_per_layer,
+                "lens_layer_of_first_prominence": lens_first_prominence,
+                "plain_logit_lens_layer_of_first_prominence": plain_first_prominence,
+                "confound_check_word_in_preceding_text": confounds,
+                "lens_topk_per_layer": lens_topk_per_layer,
+                "plain_logit_lens_topk_per_layer": plain_topk_per_layer,
+            })
+            print(f"  done: {input_ids.shape[-1]} tokens")
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / "results_e9_extra.json").write_text(
+        json.dumps(records, indent=2, ensure_ascii=False), encoding="utf-8")
+    config = {
+        "experiment": "9-extra", "model": "qwen3.5-122b-a10b",
+        "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
+        "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
+        "flagship_condition": FLAGSHIP_CONDITION, "flagship_row": FLAGSHIP_ROW,
+        "target_markers": TARGET_MARKERS_EXTRA, "pre_registered_words": PRE_REGISTERED_WORDS,
+        "exploratory_words": EXPLORATORY_WORDS, "top_k_for_prominence": TOP_K_FOR_PROMINENCE,
+    }
+    (OUT_DIR / "config_e9_extra.json").write_text(
+        json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"saved {OUT_DIR}/results_e9_extra.json and config_e9_extra.json")
+
+
 # --- stage: read_conditions (Tier A extension: baseline/below_good analogs) ----
 
-def _run_read_conditions():
-    """Reads CROSS_CONDITION_POSITIONS -- the baseline/below_good analogs of the
-    flagship's numeric_assumption and reconsideration ("Decision:") position types.
-    Answers the single biggest open question from the first pass: is marker 10305's
-    internal "bias" signal specific to the incentivized above_good condition, or does
-    the same signal appear at an equivalent commitment point regardless of condition?
-    Identical per-position computation to _run_read -- same four required checks,
-    same helper functions -- only the position-finding method differs (see
-    CROSS_CONDITION_POSITIONS's own comment)."""
+def _run_read_conditions(positions=None, out_suffix=""):
+    """Reads CROSS_CONDITION_POSITIONS (default) or another positions list passed in --
+    e.g. CROSS_CONDITION_POSITIONS_EXTRA, via out_suffix="_extra" -- the baseline/below_good
+    analogs of the flagship's various position types. Answers the same question each time:
+    is a given position's internal signal specific to the incentivized condition, or does the
+    same signal appear at an equivalent point regardless of condition? Identical per-position
+    computation to _run_read -- same four required checks, same helper functions -- only the
+    position-finding method differs (see CROSS_CONDITION_POSITIONS's own comment)."""
+    positions = CROSS_CONDITION_POSITIONS if positions is None else positions
+    marker_notes = {**TARGET_MARKERS, **TARGET_MARKERS_EXTRA}
     tokenizer, hf_model, model, lens = load_model_and_tokenizer()
 
     records = []
-    for spec in CROSS_CONDITION_POSITIONS:
+    for spec in positions:
         prompt, reasoning = load_trace(spec["condition"], spec["row_index"])
         for cut_name, offset_key in (("entry", "start"), ("exit", "end")):
             cutoff = spec[offset_key]
@@ -509,7 +633,7 @@ def _run_read_conditions():
             records.append({
                 "condition": spec["condition"], "row_index": spec["row_index"],
                 "analog_of_marker": spec["analog_of_marker"],
-                "analog_of_marker_note": TARGET_MARKERS[spec["analog_of_marker"]],
+                "analog_of_marker_note": marker_notes[spec["analog_of_marker"]],
                 "kind": spec["kind"], "cut": cut_name, "cutoff_char": cutoff,
                 "n_tokens": input_ids.shape[-1],
                 "lens_scores_per_layer": lens_scores_per_layer,
@@ -523,19 +647,19 @@ def _run_read_conditions():
             print(f"  done: {input_ids.shape[-1]} tokens")
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / "results_e9_conditions.json").write_text(
+    (OUT_DIR / f"results_e9_conditions{out_suffix}.json").write_text(
         json.dumps(records, indent=2, ensure_ascii=False), encoding="utf-8")
     config = {
         "experiment": "9-tierA", "model": "qwen3.5-122b-a10b",
         "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
         "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
-        "positions": CROSS_CONDITION_POSITIONS,
+        "positions": positions,
         "pre_registered_words": PRE_REGISTERED_WORDS, "exploratory_words": EXPLORATORY_WORDS,
         "top_k_for_prominence": TOP_K_FOR_PROMINENCE,
     }
-    (OUT_DIR / "config_e9_conditions.json").write_text(
+    (OUT_DIR / f"config_e9_conditions{out_suffix}.json").write_text(
         json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"saved {OUT_DIR}/results_e9_conditions.json and config_e9_conditions.json")
+    print(f"saved {OUT_DIR}/results_e9_conditions{out_suffix}.json and config_e9_conditions{out_suffix}.json")
 
 
 # --- stage: plot (no GPU needed -- everything below reads only the saved JSON) --
@@ -907,6 +1031,95 @@ def _run_plot_conditions():
     print("\nTier A condition figures saved to", OUT_DIR)
 
 
+def _run_plot_extra():
+    """Heatmaps for TARGET_MARKERS_EXTRA -- reuses _plot_heatmaps directly, unmodified: it
+    already groups by rec["marker"] and reads rec["marker_note"]/["cut"]/topk fields generically,
+    which the extra records populate identically to the original three, so no new plotting code
+    was needed here, only new data."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    extra_path = OUT_DIR / "results_e9_extra.json"
+    if not extra_path.exists():
+        raise FileNotFoundError(f"{extra_path} not found -- run --stage read_extra first")
+    records = json.loads(extra_path.read_text(encoding="utf-8"))
+    saved = _plot_heatmaps(records, plt)
+    print("\nExtra-position heatmaps saved:", [str(p) for p in saved])
+
+
+def _plot_condition_comparison_extra(flagship_extra_records, cond_extra_records, plt):
+    """Same purpose as _plot_condition_comparison, for the topically-picked positions --
+    handles the asymmetry documented in CROSS_CONDITION_POSITIONS_EXTRA's own comment
+    explicitly, rather than silently plotting a zero/missing bar: marker 18407 has a real
+    baseline analog (3 bars); marker 16088 (standing in for the "bad cause" clause type,
+    covering both 16088 and 20283) has NO baseline analog, because that clause's content
+    cannot exist in an unincentivized trace -- shown as an annotated gap, not a zero."""
+    def peak_score(records, **match):
+        cands = [r for r in records if all(r.get(k) == v for k, v in match.items())]
+        if len(cands) != 2:
+            return None
+        scores = [
+            v["max_logprob"]
+            for rec in cands
+            for layer_scores in rec["lens_scores_per_layer"].values()
+            for v in layer_scores.values()
+            if v["max_logprob"] is not None
+        ]
+        return max(scores) if scores else None
+
+    marker_types = [18407, 16088]
+    conditions = ["baseline", "below_good", "above_good"]
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    width = 0.25
+    for i, cond in enumerate(conditions):
+        ys, xs = [], []
+        for j, m in enumerate(marker_types):
+            if cond == "above_good":
+                val = peak_score(flagship_extra_records, marker=m)
+            else:
+                val = peak_score(cond_extra_records, condition=cond, analog_of_marker=m)
+            if val is None:
+                continue  # no bar plotted -- e.g. baseline for marker 16088 -- annotated below instead
+            ys.append(val)
+            xs.append(j + (i - 1) * width)
+        ax.bar(xs, ys, width, label=cond)
+    ax.annotate("no baseline analog exists --\nthis content cannot occur\nwithout an active bet",
+                xy=(1, -9.5), ha="center", fontsize=7, style="italic")
+    ax.set_xticks(range(len(marker_types)))
+    ax.set_xticklabels([
+        "marker 18407\n(\"AI... truth vs. bet\")",
+        "marker 16088/20283\n(\"bad cause\" clause)",
+    ], fontsize=9)
+    ax.set_ylabel("peak tracked-word log-probability\n(raw, NOT normalized -- comparable across bars)", fontsize=9)
+    ax.set_title(
+        "Tier A extension: same condition-specificity check as before, for the two\n"
+        "strongest-signal topically-picked positions. Marker 16088/20283's own content\n"
+        "cannot exist in baseline, so no baseline bar is plotted there -- not a zero result.",
+        fontsize=9)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    out_path = OUT_DIR / "condition_comparison_extra_e9.png"
+    fig.savefig(out_path, dpi=160)
+    print(f"saved {out_path}")
+
+
+def _run_plot_conditions_extra():
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    cond_path = OUT_DIR / "results_e9_conditions_extra.json"
+    if not cond_path.exists():
+        raise FileNotFoundError(f"{cond_path} not found -- run --stage read_conditions_extra first")
+    cond_records = json.loads(cond_path.read_text(encoding="utf-8"))
+    flagship_records = json.loads((OUT_DIR / "results_e9_extra.json").read_text(encoding="utf-8"))
+
+    _plot_heatmaps_conditions(cond_records, plt)
+    _plot_condition_comparison_extra(flagship_records, cond_records, plt)
+    print("\nTier A extra-condition figures saved to", OUT_DIR)
+
+
 def _run_plot():
     import matplotlib
     matplotlib.use("Agg")
@@ -960,8 +1173,18 @@ def main(stage: str):
         _run_read_conditions()
     elif stage == "plot_conditions":
         _run_plot_conditions()
+    elif stage == "read_extra":
+        _run_read_extra()
+    elif stage == "plot_extra":
+        _run_plot_extra()
+    elif stage == "read_conditions_extra":
+        _run_read_conditions(CROSS_CONDITION_POSITIONS_EXTRA, "_extra")
+    elif stage == "plot_conditions_extra":
+        _run_plot_conditions_extra()
     else:
-        raise ValueError(f"unknown stage {stage!r}; one of diagnose/read/plot/read_conditions/plot_conditions")
+        raise ValueError(
+            f"unknown stage {stage!r}; one of diagnose/read/plot/read_conditions/"
+            "plot_conditions/read_extra/plot_extra/read_conditions_extra/plot_conditions_extra")
 
 
 if __name__ == "__main__":

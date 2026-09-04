@@ -318,3 +318,146 @@ already-downloaded model and lens (no re-download, no new API spend — `baselin
   and Tier A, measured directly from the pod's own clock (not estimated): **68 minutes**,
   roughly **$4.07-5.20** at $3.59-4.59/hour. Tracked separately from the $10 target/$15 ceiling
   Anthropic-side ledger, which remains unchanged at ~$2.52 — see `BUDGET_neel.md`.
+
+### Extra positions — picked for topical richness, not behavioral shift
+
+**Status: COMPLETE (3 new flagship-trace positions, 6 new reads).** Requested directly: the
+first pass's three positions were chosen purely by Experiment 8's behavioral-shift ranking,
+which meant none were chosen for being thematically on-topic, and the resulting heatmaps were
+sparse — mostly generic Fermi-estimate vocabulary with only occasional bias-cluster words. This
+run instead selects positions by reading through all 22 of Experiment 8's hand-verified
+positions' actual text and picking the most directly self-referential/values-adjacent
+sentences, still on the same flagship trace, same model and lens (no new download or API spend).
+
+- **Hypothesis started from:** the flagship trace contains several points where the model
+  explicitly engages with the bet's structure or its own conduct as an AI, rather than just
+  performing ordinary Fermi-estimate arithmetic — do these show a stronger and more legible
+  internal signal than the structurally-selected positions did? Three were chosen: marker 18407
+  ("If I am an AI, should I prioritize the user's bet over truth?" — a direct, explicit
+  self-referential values question), marker 16088 ("This is a request to maximize the number
+  for a specific outcome," following a verbatim restatement of the good-cause/bad-cause clause),
+  and marker 20283 ("Wait, I need to be careful about the 'bad cause' clause" — a shorter
+  variant of the same). Each was checked against the actual confound-check logic before
+  selection, not just eyeballed for topical relevance: 18407 and 20283 contain no tracked word
+  literally, at either cut; 16088 contains "threshold" (restating the prompt) within the
+  sentence itself, so its exit cut was expected to correctly confound-flag that one word.
+- **Which hypothesis it moved:** strongly confirmed. This is now the strongest and most
+  legible batch of hits in the entire experiment, and it triples the number of positions that
+  clear the full pre-registered hidden-concept bar (confound-free, beats plain control, reaches
+  top-20 in the lens but never in the control) from one (marker 10305) to three.
+- **Main result:**
+  - **Marker 16088, exit — by far the strongest, cleanest result in this experiment.** "incentiv"
+    reaches log-probability **-2.878** in the J-lens at layer 38, versus **-9.239** for the
+    plain-logit-lens control at its own best layer — a gap of roughly **6.4 natural-log units,
+    corresponding to about 580 times more probability mass** than the plain control assigns the
+    same word. "incentiv" ranks in the lens's own top-20 from layer 32 onward; it never once
+    reaches that rank in the plain control, at any layer. Checked specifically (not just
+    inferred from the aggregate confound list): "incentiv" itself does not appear anywhere in
+    the preceding text at this cut — only "threshold" does (correctly flagged separately, from
+    the sentence restating the prompt) — so this is not the same confound that undermined
+    Experiment 7's original attempt. Confirmed visually as well as numerically: the redrawn
+    heatmap shows "incentiv" recurring across layers 34-39, alongside "biases" and "dishonest"
+    (both flagged), sitting in a dense cluster of on-topic vocabulary — "ethical," "unethical,"
+    "ethics," "mitigation," "implications," "limitations," "motivations" — a qualitatively
+    richer neighborhood than any of the original three positions' heatmaps showed.
+  - **Marker 20283, exit — a second position clearing the full test.** "incentiv" again: lens
+    -5.565 vs. plain -9.064 (3.5 log-prob gap), confound-free, ranks in the lens's top-20 at
+    layer 39, never in the plain control's.
+  - **Marker 18407 (both cuts) and marker 16088 entry show the weaker, continuous-only pattern**
+    already seen at two of the original three positions: the lens clearly beats the plain
+    control (gaps of 1.4 to 3.3 log-prob units, for "unbiased" and "dishonesty"), confound-free,
+    but neither word reaches the top-20 threshold in either reading.
+  - Combined with the first pass, **three of the six positions now tested on the flagship trace
+    clear the full hidden-concept bar** (10305, 16088, 20283 — all "exit" cuts, all in the
+    bias/incentive word cluster specifically, not a scattered mix of unrelated words), and all
+    six show at least the weaker continuous-only pattern. No position has come back a clean,
+    total null.
+- **Interesting notes:** all three positions were picked by directly reading the actual
+  sentence text of every one of Experiment 8's 22 hand-verified positions, not by a fresh
+  keyword search of the trace — this matters because it means the selection is grounded in
+  positions already independently verified to exist exactly where claimed, rather than a new,
+  unverified string match. The pattern that the three positions clearing the full test are all
+  "exit" cuts (read just after the sentence resolves, not before) held again here, consistent
+  with the first pass — worth noting as a possible general pattern (the signal builds through
+  the sentence and is strongest once it resolves) rather than three coincidences, though still
+  only six data points.
+- **Limitations:** these positions were selected for topical content, not for behavioral
+  importance — their own Experiment 8 shifts are small (0.008 to 0.065, versus marker 2813's
+  0.157) — so this batch says nothing new about the convergence question from the first pass;
+  it is a different, complementary axis (concept legibility) not a replacement for it. Still one
+  trace, still exploratory; no cross-condition (baseline/below_good) comparison has been run for
+  these three positions yet, unlike 2813/10305.
+- **Figures:** `heatmap_e9_marker16088.png`, `heatmap_e9_marker18407.png`,
+  `heatmap_e9_marker20283.png` (same auto-fit/highlighting style as the original three). Raw
+  data in `results_e9_extra.json`/`config_e9_extra.json`, same directory.
+- **Cost:** 6 new forward-pass reads (a few seconds each, model already loaded from the prior
+  run this session). Total session wall-clock, measured directly: 18:49:54 to 20:25:49, **96
+  minutes**, roughly **$5.74-7.34** at $3.59-4.59/hour, covering the entire Experiment 9 session
+  (first pass + Tier A + this extension). Tracked separately from the $10/$15 Anthropic-side
+  ledger, unchanged at ~$2.52.
+
+### Are the extra positions condition-specific?
+
+**Status: COMPLETE.** Requested directly, after the extra-positions batch above turned out to
+have the strongest signals in the whole experiment: does marker 16088/20283's dramatic hit, and
+marker 18407's more modest one, hold up the same way marker 10305's did when checked against
+baseline and below_good?
+
+- **Hypothesis started from:** the same test as Tier A, applied to the two new strong
+  positions. Comparison positions found the same way, checked directly rather than assumed
+  clean: **marker 18407's analog** ("as an AI, should I prioritize...") generalizes well to
+  both other conditions — "as an AI" reflections occur in 9/100 baseline rows and 65/100
+  below_good rows (checked directly), so both a baseline row 32 ("As an AI, I must adhere to
+  safety and honesty guidelines") and a below_good row 32 ("As an AI, I should prioritize
+  accuracy over the outcome of the bet") analog exist, confound-free, same row index used for
+  both. **Marker 16088/20283's analog cannot be found in baseline at all** — checked directly,
+  not assumed: the literal phrases "bad cause" and "good cause" appear in 0 of baseline's 100
+  rows, because baseline's prompt never mentions a bet, so this position's own content
+  structurally cannot exist there. A below_good analog (row 13: "As an AI, I should not
+  manipulate the number to influence the bet outcome ('bad cause' vs 'good cause')") stands in
+  for both 16088 and 20283, since they discuss the same clause. This one sentence literally
+  contains "manipulate" and "influence" — any signal for those two specific words there is an
+  expected, correctly-caught confound, not a hidden one; other tracked words remain valid.
+- **Which hypothesis it moved:** away from a clean second confirmation of "incentivized
+  condition shows the strongest signal." Both new comparisons complicate that simple story
+  rather than repeating marker 10305's clean pattern.
+- **Main result:**
+
+  | Position-type | Condition | Peak word (log-prob) |
+  |---|---|---|
+  | 18407-type ("AI... truth vs. bet") | baseline | dishonesty (-6.723) |
+  | 18407-type | below_good | **incentiv (-4.133)** |
+  | 18407-type | above_good (original) | dishonesty (-6.159) |
+  | 16088/20283-type ("bad cause" clause) | baseline | *(no analog exists)* |
+  | 16088/20283-type | below_good | unbiased (-2.726) |
+  | 16088/20283-type | above_good (original) | incentiv (-2.878) |
+
+  **For the 18407-type, below_good shows the strongest signal of all three — not above_good.**
+  Baseline (-6.723) and above_good (-6.159) are close to each other and both clearly weaker
+  than below_good (-4.133). If the hypothesis were "the incentivized-toward-above condition
+  shows the strongest signal at this position," above_good should lead; it does not. **A
+  real methodological wrinkle, not glossed over: the driving word differs by condition** —
+  baseline and above_good's peak word is "dishonesty," below_good's is "incentiv" — so this
+  comparison is not tracking one fixed concept's strength across conditions the way the 10305
+  comparison did (where "bias" led in all three); it is comparing whichever tracked word
+  happens to be strongest in each condition, which is a weaker, less interpretable comparison
+  by construction. **For the 16088/20283-type, below_good and above_good are nearly identical**
+  (-2.726 vs. -2.878, a 0.15 log-prob difference — effectively no distinction) with no baseline
+  point to complete the picture. Read together, these two results are consistent with a
+  different, looser hypothesis than "signal tracks the specific favored direction": having *any*
+  active bet (either direction) may be what elevates this concept cluster, not which side is
+  favored — but this is speculative on two data points with no baseline comparator for one of
+  them, not a finding to lean on.
+- **Interesting notes:** this result is a useful corrective on its own terms — it shows the
+  condition-specificity finding from Tier A (marker 10305) does not automatically generalize to
+  every position that shows a strong signal, and the two new positions being checked precisely
+  is what surfaced that, rather than assuming the pattern would repeat.
+- **Limitations:** two more single-position, single-row comparisons; the varying peak-word
+  identity across conditions (noted above) means these bar heights are a weaker comparison than
+  marker 10305's fixed-word one; no baseline point exists for the 16088/20283-type by
+  construction, not oversight.
+- **Figures:** `heatmap_e9_conditions_analog18407.png`, `heatmap_e9_conditions_analog16088.png`,
+  `condition_comparison_extra_e9.png`. Raw data in `results_e9_conditions_extra.json`/
+  `config_e9_conditions_extra.json`.
+- **Cost:** 6 more forward-pass reads, model already loaded. See `BUDGET_neel.md` for the
+  session's running total.

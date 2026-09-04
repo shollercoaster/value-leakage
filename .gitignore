@@ -2,3 +2,6 @@
 .venv/
 __pycache__/
 *.egg-info/
+docs_neel/.ipynb_checkpoints/
+model_download.log
+model_download2.log
