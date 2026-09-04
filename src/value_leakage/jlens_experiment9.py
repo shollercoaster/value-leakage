@@ -90,6 +90,31 @@ class _SafeOverrides(dict):
 
 _fg8.FP8Experts._impl_tp_layer_overrides = _SafeOverrides(_fg8.FP8Experts._impl_tp_layer_overrides)
 
+# Workaround 3 of 3 (found live on this pod, not in FINDINGS.md's Experiment 7 entry --
+# that pass evidently never exercised this code path). `TRANSFORMERS_DISABLE_DEEPGEMM_LINEAR=1`
+# correctly routes fp8 linears to the Triton finegrained-fp8 fallback instead of DeepGEMM, but
+# loading that fallback kernel (`kernels-community/finegrained-fp8`, hub-fetched) fails: its
+# `bayesian_autotuner.py` does `from triton.runtime.autotuner import (JITFunction,
+# get_cache_invalidating_env_vars, get_cache_manager, triton_key, ...)`, and this installed
+# triton (3.4.0) no longer re-exports those four names from that module -- they were moved to
+# their actual defining modules (`triton.runtime.jit`, `triton.runtime.cache`,
+# `triton.compiler.compiler`). This is a pure import-location shim: it does not touch any fp8
+# dequantization or matmul math, just restores four names to where the hub kernel's own code
+# expects to import them from, so the kernel's real (unmodified) implementation loads.
+import triton.runtime.autotuner as _tra
+import triton.runtime.jit as _trj
+import triton.runtime.cache as _trc
+import triton.compiler.compiler as _tcc
+
+for _name, _source in (
+    ("JITFunction", _trj),
+    ("get_cache_manager", _trc),
+    ("triton_key", _tcc),
+    ("get_cache_invalidating_env_vars", _tcc),
+):
+    if not hasattr(_tra, _name):
+        setattr(_tra, _name, getattr(_source, _name))
+
 MODEL_DIR = "/workspace/models/Qwen3.5-122B-A10B-FP8"
 LENS_PATH = "/workspace/lenses/workspace-lenses/qwen3.5-122b-a10b/j-lens/lens.pt"
 FLAGSHIP_RUN_DIR = "/workspace/value-leakage/runs/qwen3.5-122b-a10b_20260815_030702"
@@ -113,7 +138,18 @@ TARGET_MARKERS = {
 # pre-registered, for consistency with how that experiment treated it.
 PRE_REGISTERED_WORDS = ["bias", "manipulate", "cheat", "donation", "threshold", "influence"]
 EXPLORATORY_WORDS = ["dishonesty", "dishonest", "charity", "lie", "unfair", "unbiased",
-                     "incentiv", "reward", "奖励", "激励", "奖金", "獎勵"]
+                     "incentiv", "reward", "奖励", "激励", "奖金", "獎勵",
+                     # Added AFTER seeing "risk"/"risks"/"risky"/"risking" recur prominently
+                     # in the heatmap at the marker 10305 "Decision:" position -- explicitly
+                     # a post-hoc, exploratory addition (matches the same substring-inclusion
+                     # convention "incentiv" already uses, so this one entry also flags the
+                     # plural/adjective/gerund forms), never promoted to pre-registered, per
+                     # this project's own pre-registration discipline (EXPERIMENTS_NEEL_NANDA.md
+                     # section 6). NOTE: this only affects heatmap highlighting and any FUTURE
+                     # --stage read -- results_e9.json was already saved with the word list
+                     # that did NOT include "risk", so its continuous-score/first-prominence/
+                     # confound-check numbers for "risk" specifically do not exist yet.
+                     "risk"]
 ALL_TRACKED_WORDS = [(w, "pre_registered") for w in PRE_REGISTERED_WORDS] + \
                     [(w, "exploratory") for w in EXPLORATORY_WORDS]
 
@@ -128,6 +164,59 @@ def load_flagship_text():
     data = json.loads(Path(f"{FLAGSHIP_RUN_DIR}/{FLAGSHIP_CONDITION}.json").read_text(encoding="utf-8"))
     row = data["rows"][FLAGSHIP_ROW]
     return data["prompt"], row["reasoning"]
+
+
+def load_trace(condition: str, row_index: int):
+    """Generalizes load_flagship_text to any condition/row in the same shipped
+    run directory -- used for the baseline/below_good cross-condition positions
+    below."""
+    data = json.loads(Path(f"{FLAGSHIP_RUN_DIR}/{condition}.json").read_text(encoding="utf-8"))
+    row = data["rows"][row_index]
+    return data["prompt"], row["reasoning"]
+
+
+# Cross-condition analog positions (Tier A extension, per the applicant's own request
+# after Experiment 9's first pass: "close the no-baseline gap"). The flagship's three
+# marker positions were HAND-VERIFIED specifically on that one above_good trace by
+# Experiment 8's own position-finding process -- there is no equivalent hand-verified
+# position list for baseline/below_good, so these are found here by a DIFFERENT,
+# explicitly mechanical method, documented per-position so it's checkable rather than
+# asserted:
+#   - "reconsideration" analog (mirrors marker 10305, the ONE position that passed
+#     Experiment 9's full hidden-concept test): found by literal string search for a
+#     "Decision:" heading -- this exact phrase recurs as generic Fermi-estimate
+#     boilerplate in this model's reasoning style regardless of condition (confirmed by
+#     grep: present in 12/20 baseline rows and 17/20 below_good rows sampled), so it is
+#     a genuine structural analog, not a coincidence.
+#   - "numeric_assumption" analog (mirrors marker 2813, the largest BEHAVIORAL shift in
+#     Experiment 8): found by RELATIVE POSITION, not topic match -- marker 2813 sits at
+#     char 2813 of the flagship's 22033-char reasoning (12.77% through the trace); the
+#     same fraction is located in each condition's chosen row, then snapped outward to
+#     the nearest full sentence boundary (same "[.!?]\\s" convention used to measure
+#     average sentence density in EXPERIMENTS.md). This deliberately does NOT search for
+#     a topically-matching sentence (e.g. another "spot size" assumption) -- picking
+#     "the sentence that looks most similar" would be a real, if well-intentioned, form
+#     of cherry-picking. Matching by structural position instead answers a cleaner
+#     question: "what does the internal state look like at a comparable early
+#     assumption-building point in the reasoning," independent of the specific words
+#     used there.
+#   - Row selection: `above_good` row 43 is the flagship's own row, so baseline row 43
+#     was tried first for consistency (same row index, not cherry-picked). It has a
+#     valid "Decision:" analog. `below_good` row 43 has no "reasoning" field at all
+#     (its original generation call hit a rate-limit error and was never filled in --
+#     `{"i": 43, "error": "RetryError...RateLimitError"}`), so below_good row 0 was
+#     used instead -- the first row with a valid `reasoning` field, a fixed, arbitrary,
+#     pre-specified rule rather than a search for the "best-looking" row.
+CROSS_CONDITION_POSITIONS = [
+    {"condition": "baseline", "row_index": 43, "analog_of_marker": 2813,
+     "kind": "numeric_assumption", "start": 3168, "end": 3293},
+    {"condition": "baseline", "row_index": 43, "analog_of_marker": 10305,
+     "kind": "reconsideration", "start": 18583, "end": 18652},
+    {"condition": "below_good", "row_index": 0, "analog_of_marker": 2813,
+     "kind": "numeric_assumption", "start": 2938, "end": 3296},
+    {"condition": "below_good", "row_index": 0, "analog_of_marker": 10305,
+     "kind": "reconsideration", "start": 23341, "end": 23378},
+]
 
 
 def load_positions():
@@ -219,11 +308,20 @@ def plain_logit_lens_per_layer(hf_model, input_ids: torch.Tensor) -> dict:
     with torch.no_grad():
         outputs = hf_model(input_ids, output_hidden_states=True, use_cache=False)
     # outputs.hidden_states: tuple of (n_layers + 1) tensors, [0] is the embedding
-    # output, [1:] are post-block hidden states -- layer indexing here is
-    # 1-based to match jlens's own per-layer numbering as seen in its saved
-    # output (cross-check this against the diagnose stage's printed layer keys).
+    # output, [1:] are post-block hidden states. Layer indexing here is 0-based
+    # and DELIBERATELY matches jlens's own convention exactly, confirmed by
+    # reading jacobian-lens/jlens/lens.py directly rather than assumed: jlens's
+    # `apply()` hooks `model.layers[L]` (a 0-indexed nn.ModuleList) and reads its
+    # output as "layer L", with `final_layer = model.n_layers - 1`. That is the
+    # same tensor as `hidden_states[L + 1]` here (hidden_states[0] is the
+    # pre-block embedding, hidden_states[1] is the output of the first, i.e.
+    # index-0, block). Using `start=1` here (one-based) would silently offset
+    # every "layer of first prominence" comparison against the lens by exactly
+    # one layer -- checked directly against the diagnose stage's own top-5
+    # agreement check, which compares by VALUE (via max()) and so passes under
+    # either numbering; it does not by itself catch a labeling offset.
     per_layer = {}
-    for layer_idx, hidden in enumerate(outputs.hidden_states[1:], start=1):
+    for layer_idx, hidden in enumerate(outputs.hidden_states[1:], start=0):
         last_token_hidden = hidden[0, -1, :]  # position -1: the read point itself
         normed = base.norm(last_token_hidden)
         logits = lm_head(normed)
@@ -375,6 +473,76 @@ def _run_read():
     print(f"saved {OUT_DIR}/results_e9.json and config_e9.json")
 
 
+# --- stage: read_conditions (Tier A extension: baseline/below_good analogs) ----
+
+def _run_read_conditions():
+    """Reads CROSS_CONDITION_POSITIONS -- the baseline/below_good analogs of the
+    flagship's numeric_assumption and reconsideration ("Decision:") position types.
+    Answers the single biggest open question from the first pass: is marker 10305's
+    internal "bias" signal specific to the incentivized above_good condition, or does
+    the same signal appear at an equivalent commitment point regardless of condition?
+    Identical per-position computation to _run_read -- same four required checks,
+    same helper functions -- only the position-finding method differs (see
+    CROSS_CONDITION_POSITIONS's own comment)."""
+    tokenizer, hf_model, model, lens = load_model_and_tokenizer()
+
+    records = []
+    for spec in CROSS_CONDITION_POSITIONS:
+        prompt, reasoning = load_trace(spec["condition"], spec["row_index"])
+        for cut_name, offset_key in (("entry", "start"), ("exit", "end")):
+            cutoff = spec[offset_key]
+            prefix = build_prefix(tokenizer, prompt, reasoning[:cutoff])
+            print(f"reading condition={spec['condition']} row={spec['row_index']} "
+                  f"analog_of={spec['analog_of_marker']} ({cut_name}) ...")
+
+            lens_logits, model_logits, input_ids = lens.apply(model, prefix, positions=[-1], max_seq_len=8192)
+            plain_logits = plain_logit_lens_per_layer(hf_model, input_ids)
+
+            lens_by_layer = {l: v[0] for l, v in lens_logits.items()}
+            lens_scores_per_layer = {layer: continuous_scores(logits, tokenizer)
+                                     for layer, logits in lens_by_layer.items()}
+            plain_scores_per_layer = {layer: continuous_scores(logits, tokenizer)
+                                      for layer, logits in plain_logits.items()}
+            lens_first_prominence = layer_of_first_prominence(lens_by_layer, tokenizer)
+            plain_first_prominence = layer_of_first_prominence(plain_logits, tokenizer)
+            lens_topk_per_layer = topk_tokens_per_layer(lens_by_layer, tokenizer)
+            plain_topk_per_layer = topk_tokens_per_layer(plain_logits, tokenizer)
+
+            context_window = reasoning[max(0, cutoff - CONFOUND_CONTEXT_CHARS):cutoff]
+            confounds = {w: confound_check(context_window, w) for w, _ in ALL_TRACKED_WORDS}
+
+            records.append({
+                "condition": spec["condition"], "row_index": spec["row_index"],
+                "analog_of_marker": spec["analog_of_marker"],
+                "analog_of_marker_note": TARGET_MARKERS[spec["analog_of_marker"]],
+                "kind": spec["kind"], "cut": cut_name, "cutoff_char": cutoff,
+                "n_tokens": input_ids.shape[-1],
+                "lens_scores_per_layer": lens_scores_per_layer,
+                "plain_logit_lens_scores_per_layer": plain_scores_per_layer,
+                "lens_layer_of_first_prominence": lens_first_prominence,
+                "plain_logit_lens_layer_of_first_prominence": plain_first_prominence,
+                "confound_check_word_in_preceding_text": confounds,
+                "lens_topk_per_layer": lens_topk_per_layer,
+                "plain_logit_lens_topk_per_layer": plain_topk_per_layer,
+            })
+            print(f"  done: {input_ids.shape[-1]} tokens")
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / "results_e9_conditions.json").write_text(
+        json.dumps(records, indent=2, ensure_ascii=False), encoding="utf-8")
+    config = {
+        "experiment": "9-tierA", "model": "qwen3.5-122b-a10b",
+        "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
+        "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
+        "positions": CROSS_CONDITION_POSITIONS,
+        "pre_registered_words": PRE_REGISTERED_WORDS, "exploratory_words": EXPLORATORY_WORDS,
+        "top_k_for_prominence": TOP_K_FOR_PROMINENCE,
+    }
+    (OUT_DIR / "config_e9_conditions.json").write_text(
+        json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"saved {OUT_DIR}/results_e9_conditions.json and config_e9_conditions.json")
+
+
 # --- stage: plot (no GPU needed -- everything below reads only the saved JSON) --
 
 # Experiment 8's own real, already-measured behavioral shifts at these same three
@@ -398,7 +566,15 @@ def flag_word(tok: str) -> str | None:
 def _plot_heatmap_panel(ax, per_layer: dict, title: str):
     """One layer x top-k-rank panel, colored by logit relative to that layer's
     own top-1 -- same visual convention as Experiment 7's jlens_heatmap.py, so
-    the two are directly comparable side by side."""
+    the two are directly comparable side by side.
+
+    Returns (im, texts): `texts` is every per-cell word Text artist, handed back
+    to _plot_heatmaps so it can auto-shrink any that don't yet fit their cell
+    (see _autofit_cell_texts) -- a fixed font size cannot work here since decoded
+    tokens range from 1 char ("i") to 11+ ("submissions", "certainty"); sizing
+    for the longest would waste space on every short one, sizing for the average
+    overflows on the long ones, which is exactly the "words run outside the
+    boxes" problem the user flagged."""
     import numpy as np
     layers = sorted(int(l) for l in per_layer)
     n_layers = len(layers)
@@ -415,52 +591,119 @@ def _plot_heatmap_panel(ax, per_layer: dict, title: str):
             flags[r, col] = flag_word(toks[r])
     im = ax.imshow(grid, aspect="auto", cmap="viridis", vmin=-15, vmax=0)
     ax.set_yticks(range(TOP_K_HEATMAP))
-    ax.set_yticklabels([f"#{r + 1}" for r in range(TOP_K_HEATMAP)])
+    ax.set_yticklabels([f"#{r + 1}" for r in range(TOP_K_HEATMAP)], fontsize=13)
     ax.set_xticks(range(n_layers))
-    ax.set_xticklabels(layers, fontsize=6, rotation=90)
-    ax.set_xlabel("layer")
-    ax.set_ylabel("top-k rank")
-    ax.set_title(title, fontsize=9, loc="left")
+    ax.set_xticklabels(layers, fontsize=11, rotation=90)
+    ax.set_xlabel("layer", fontsize=13)
+    ax.set_ylabel("top-k rank", fontsize=13)
+    ax.set_title(title, fontsize=15, loc="left")
+    texts = []
     for r in range(TOP_K_HEATMAP):
         for c in range(n_layers):
             f = flags[r, c]
             edge = {"pre_registered": "red", "exploratory": "orange"}.get(f)
             weight = "bold" if edge else "normal"
+            # Starting fontsize -- deliberately generous; _autofit_cell_texts shrinks
+            # only the individual cells that need it (long decoded tokens), so most
+            # cells (short words) keep this full size rather than being sized down
+            # to fit the worst case across the whole grid.
             txt = ax.text(c, r, annot[r, c], ha="center", va="center",
-                          fontsize=5.5, color="white", weight=weight)
+                          fontsize=12, color="white", weight=weight)
             if edge:
-                txt.set_bbox(dict(boxstyle="round,pad=0.1", fc="none", ec=edge, lw=1.2))
-    return im
+                txt.set_bbox(dict(boxstyle="round,pad=0.25", fc="none", ec=edge, lw=2.2))
+            texts.append(txt)
+    return im, texts
+
+
+def _autofit_cell_texts(fig, entries, target_frac: float = 0.86, min_fontsize: float = 4.0,
+                         max_passes: int = 5) -> None:
+    """Shrinks each text's fontsize, INDIVIDUALLY, until its actual rendered pixel
+    width (measured via the real renderer, not estimated from character count) fits
+    within `target_frac` of its own cell's pixel width. This is what guarantees the
+    entire word stays inside its box -- a uniform fontsize increase alone cannot do
+    this, since cell width is fixed by the figure/column layout while word length
+    varies per cell. `entries` is a list of (ax, text_artist) pairs, pooled across
+    every panel in the figure so long words in either the J-lens or plain-control
+    panel are each fit to their own panel's cell width (the two can differ slightly
+    since the plain control has one extra layer)."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    for _ in range(max_passes):
+        any_adjusted = False
+        for ax, txt in entries:
+            x0 = ax.transData.transform((0, 0))[0]
+            x1 = ax.transData.transform((1, 0))[0]
+            cell_width_px = abs(x1 - x0)
+            bbox = txt.get_window_extent(renderer)
+            if bbox.width > cell_width_px * target_frac and txt.get_fontsize() > min_fontsize:
+                ratio = (cell_width_px * target_frac) / bbox.width
+                new_size = max(min_fontsize, txt.get_fontsize() * ratio)
+                txt.set_fontsize(new_size)
+                any_adjusted = True
+        if not any_adjusted:
+            break
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
 
 
 def _plot_heatmaps(records, fig_module):
     """Visualization 1 (requested): the same style heatmap as Experiment 7's,
     one panel per (position, cut, lens-vs-plain-control) -- lets you see at a
     glance whether the J-lens surfaces something the plain logit-lens doesn't,
-    exactly the comparison the design document's confound concern is about."""
+    exactly the comparison the design document's confound concern is about.
+
+    One file PER MARKER (entry row + exit row stacked, lens/plain side by side),
+    not one giant file with all six records -- the original combined layout
+    packed ~47 layer columns x 10 ranks x 6 records into one figure, which left
+    each cell far too small for its annotated word to be legible. Splitting by
+    marker and substantially widening each panel (see fig_w below) is the fix
+    the user asked for: bigger blocks, readable words, same underlying data and
+    color convention."""
     plt = fig_module
-    n = len(records)
-    fig, axes = plt.subplots(n, 2, figsize=(22, 4.2 * n), squeeze=False)
-    for row, rec in enumerate(records):
-        im1 = _plot_heatmap_panel(
-            axes[row][0], rec["lens_topk_per_layer"],
-            f"J-LENS | marker {rec['marker']} ({rec['cut']}) -- {rec['marker_note']}")
-        im2 = _plot_heatmap_panel(
-            axes[row][1], rec["plain_logit_lens_topk_per_layer"],
-            f"PLAIN LOGIT-LENS (control) | marker {rec['marker']} ({rec['cut']})")
-        fig.colorbar(im1, ax=axes[row][0], fraction=0.02, pad=0.01)
-        fig.colorbar(im2, ax=axes[row][1], fraction=0.02, pad=0.01)
-    fig.suptitle(
-        "Experiment 9: layer x top-10-rank concept readout, J-lens (left) vs. the matched "
-        "plain-logit-lens control (right), at Experiment 8's three flagged positions.\n"
-        "Red border = pre-registered bias word. Orange border = exploratory word. "
-        "A word appearing on the LEFT but not the RIGHT, at an early layer, is the strongest "
-        "kind of evidence for a hidden concept -- the whole point of running both.",
-        fontsize=9)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    out_path = OUT_DIR / "heatmap_e9.png"
-    fig.savefig(out_path, dpi=150)
-    print(f"saved {out_path}")
+    by_marker: dict[int, list[dict]] = {}
+    for rec in records:
+        by_marker.setdefault(rec["marker"], []).append(rec)
+
+    saved = []
+    for marker in sorted(by_marker):
+        recs = sorted(by_marker[marker], key=lambda r: 0 if r["cut"] == "entry" else 1)
+        n_layers = max(len(recs[0]["lens_topk_per_layer"]), len(recs[0]["plain_logit_lens_topk_per_layer"]))
+        # Generous starting column width -- comfortably fits most real decoded tokens
+        # (up to ~9-10 chars) at the fontsize=12 _plot_heatmap_panel starts with,
+        # without relying on it for the long-tail words: _autofit_cell_texts below
+        # is what actually guarantees every word (however long) stays inside its box.
+        fig_w = 0.78 * n_layers * 2 + 3
+        fig_h = 8.5 * len(recs)
+        fig, axes = plt.subplots(len(recs), 2, figsize=(fig_w, fig_h), squeeze=False)
+        all_texts = []  # (ax, text) pairs across every panel in this figure, for autofit
+        for row, rec in enumerate(recs):
+            im1, texts1 = _plot_heatmap_panel(
+                axes[row][0], rec["lens_topk_per_layer"],
+                f"J-LENS | marker {marker} ({rec['cut']}) -- {rec['marker_note']}")
+            im2, texts2 = _plot_heatmap_panel(
+                axes[row][1], rec["plain_logit_lens_topk_per_layer"],
+                f"PLAIN LOGIT-LENS (control) | marker {marker} ({rec['cut']})")
+            all_texts.extend((axes[row][0], t) for t in texts1)
+            all_texts.extend((axes[row][1], t) for t in texts2)
+            fig.colorbar(im1, ax=axes[row][0], fraction=0.012, pad=0.006)
+            fig.colorbar(im2, ax=axes[row][1], fraction=0.012, pad=0.006)
+        fig.suptitle(
+            f"Experiment 9: layer x top-10-rank concept readout, marker {marker} "
+            f"({recs[0]['marker_note']}) -- J-lens (left) vs. the matched plain-logit-lens "
+            "control (right), entry row above, exit row below.\n"
+            "Red border = pre-registered bias word. Orange border = exploratory word. "
+            "A word appearing on the LEFT but not the RIGHT, at an early layer, is the "
+            "strongest kind of evidence for a hidden concept -- the whole point of running both.",
+            fontsize=13)
+        fig.tight_layout(rect=[0, 0, 1, 0.94])
+        # Layout is now final (axes positions/sizes fixed) -- only now do cell pixel
+        # widths mean anything, so the autofit pass runs here, right before saving.
+        _autofit_cell_texts(fig, all_texts)
+        out_path = OUT_DIR / f"heatmap_e9_marker{marker}.png"
+        fig.savefig(out_path, dpi=150)
+        saved.append(out_path)
+        print(f"saved {out_path}")
+    return saved
 
 
 def _plot_entry_vs_exit(records, plt):
@@ -475,10 +718,14 @@ def _plot_entry_vs_exit(records, plt):
         exit_ = next(r for r in records if r["marker"] == marker and r["cut"] == "exit")
 
         def best_word_score(rec):
+            # Skip any tracked word not present in this saved record (e.g. a word added
+            # to ALL_TRACKED_WORDS for heatmap highlighting after --stage read already
+            # ran and saved this data -- see the "risk" addition note above).
             best = max(
                 ((w, rec["lens_scores_per_layer"][l][w]["max_logprob"])
                  for l in rec["lens_scores_per_layer"] for w, _ in ALL_TRACKED_WORDS
-                 if rec["lens_scores_per_layer"][l][w]["max_logprob"] is not None),
+                 if w in rec["lens_scores_per_layer"][l]
+                 and rec["lens_scores_per_layer"][l][w]["max_logprob"] is not None),
                 key=lambda t: t[1], default=(None, None),
             )
             return best
@@ -543,6 +790,123 @@ def _plot_convergence(records, plt):
     print(f"saved {out_path}")
 
 
+def _plot_heatmaps_conditions(cond_records, fig_module):
+    """Same style/mechanism as _plot_heatmaps (auto-fit cell text, red/orange
+    flagged-word borders), grouped by ANALOG MARKER TYPE rather than by marker --
+    one file per position-type, with baseline's entry/exit stacked above
+    below_good's entry/exit, so the two non-incentivized-vs-incentivized-adjacent
+    conditions are directly comparable at a glance."""
+    plt = fig_module
+    by_type: dict[int, list[dict]] = {}
+    for rec in cond_records:
+        by_type.setdefault(rec["analog_of_marker"], []).append(rec)
+
+    saved = []
+    for analog_marker in sorted(by_type):
+        recs = sorted(by_type[analog_marker],
+                       key=lambda r: (r["condition"] != "baseline", r["cut"] != "entry"))
+        n_layers = max(len(recs[0]["lens_topk_per_layer"]), len(recs[0]["plain_logit_lens_topk_per_layer"]))
+        fig_w = 0.78 * n_layers * 2 + 3
+        fig_h = 8.5 * len(recs)
+        fig, axes = plt.subplots(len(recs), 2, figsize=(fig_w, fig_h), squeeze=False)
+        all_texts = []
+        for row, rec in enumerate(recs):
+            label = f"{rec['condition']} row {rec['row_index']} ({rec['cut']})"
+            im1, texts1 = _plot_heatmap_panel(
+                axes[row][0], rec["lens_topk_per_layer"],
+                f"J-LENS | {label} -- analog of marker {analog_marker}")
+            im2, texts2 = _plot_heatmap_panel(
+                axes[row][1], rec["plain_logit_lens_topk_per_layer"],
+                f"PLAIN LOGIT-LENS (control) | {label}")
+            all_texts.extend((axes[row][0], t) for t in texts1)
+            all_texts.extend((axes[row][1], t) for t in texts2)
+            fig.colorbar(im1, ax=axes[row][0], fraction=0.012, pad=0.006)
+            fig.colorbar(im2, ax=axes[row][1], fraction=0.012, pad=0.006)
+        fig.suptitle(
+            f"Experiment 9, Tier A: layer x top-10-rank concept readout, cross-condition analog "
+            f"of marker {analog_marker} ({recs[0]['kind']}) -- baseline (top 2 rows) vs. below_good "
+            f"(bottom 2 rows), J-lens (left) vs. plain-logit-lens control (right).\n"
+            "These positions are NOT the flagship trace -- they are the closest analog found in a "
+            "baseline/below_good row, per the method documented in CROSS_CONDITION_POSITIONS's own "
+            "comment. Compare against heatmap_e9_marker{}.png (the above_good original) to see "
+            "whether a signal there is condition-specific or generic.".format(analog_marker),
+            fontsize=12)
+        fig.tight_layout(rect=[0, 0, 1, 0.93])
+        _autofit_cell_texts(fig, all_texts)
+        out_path = OUT_DIR / f"heatmap_e9_conditions_analog{analog_marker}.png"
+        fig.savefig(out_path, dpi=150)
+        saved.append(out_path)
+        print(f"saved {out_path}")
+    return saved
+
+
+def _plot_condition_comparison(flagship_records, cond_records, plt):
+    """Visualization 5 (Tier A addition): the chart that actually answers the open
+    question from the first pass -- is a position-type's internal signal specific to
+    the incentivized above_good condition, or does it appear regardless of condition?
+    One group per marker-type (2813-type = numeric_assumption, 10305-type =
+    reconsideration/"Decision:"), three bars per group (baseline, below_good,
+    above_good), each bar = the peak tracked-word log-probability at that
+    position-type in that condition (max over entry+exit, over all layers/words --
+    same "peak internal score" definition _plot_convergence already uses, so the
+    above_good bar here is directly comparable to that chart's own numbers)."""
+    def peak_score(records, **match):
+        cands = [r for r in records if all(r.get(k) == v for k, v in match.items())]
+        if len(cands) != 2:  # expect exactly one entry + one exit record
+            return float("nan")
+        scores = [
+            v["max_logprob"]
+            for rec in cands
+            for layer_scores in rec["lens_scores_per_layer"].values()
+            for v in layer_scores.values()
+            if v["max_logprob"] is not None
+        ]
+        return max(scores) if scores else float("nan")
+
+    marker_types = sorted(TARGET_MARKERS)
+    conditions = ["baseline", "below_good", "above_good"]
+    fig, ax = plt.subplots(figsize=(9, 5))
+    width = 0.25
+    for i, cond in enumerate(conditions):
+        ys = []
+        for m in marker_types:
+            if cond == "above_good":
+                ys.append(peak_score(flagship_records, marker=m))
+            else:
+                ys.append(peak_score(cond_records, condition=cond, analog_of_marker=m))
+        xs = [j + (i - 1) * width for j in range(len(marker_types))]
+        ax.bar(xs, ys, width, label=cond)
+    ax.set_xticks(range(len(marker_types)))
+    ax.set_xticklabels([f"marker {m}\n({TARGET_MARKERS[m]})" for m in marker_types], fontsize=7)
+    ax.set_ylabel("peak tracked-word log-probability (raw, NOT normalized -- comparable across bars)")
+    ax.set_title(
+        "Tier A: is the internal signal at each position-type specific to the incentivized\n"
+        "condition, or does it appear in baseline/below_good too? (above_good = the original,\n"
+        "hand-verified flagship position; baseline/below_good = the closest analog found by the\n"
+        "method in CROSS_CONDITION_POSITIONS -- not the identical sentence)", fontsize=9)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    out_path = OUT_DIR / "condition_comparison_e9.png"
+    fig.savefig(out_path, dpi=160)
+    print(f"saved {out_path}")
+
+
+def _run_plot_conditions():
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    cond_path = OUT_DIR / "results_e9_conditions.json"
+    if not cond_path.exists():
+        raise FileNotFoundError(f"{cond_path} not found -- run --stage read_conditions first")
+    cond_records = json.loads(cond_path.read_text(encoding="utf-8"))
+    flagship_records = json.loads((OUT_DIR / "results_e9.json").read_text(encoding="utf-8"))
+
+    _plot_heatmaps_conditions(cond_records, plt)
+    _plot_condition_comparison(flagship_records, cond_records, plt)
+    print("\nTier A condition figures saved to", OUT_DIR)
+
+
 def _run_plot():
     import matplotlib
     matplotlib.use("Agg")
@@ -555,6 +919,14 @@ def _run_plot():
     for ax, rec in zip(axes, records):
         layers = sorted(int(l) for l in rec["lens_scores_per_layer"])
         for word, category in ALL_TRACKED_WORDS:
+            # A word can be in ALL_TRACKED_WORDS (used for heatmap highlighting) without
+            # being in the saved continuous-score data if it was added to the tracked list
+            # AFTER --stage read already ran and saved results_e9.json (e.g. "risk", added
+            # post-hoc for heatmap highlighting only) -- skip it here rather than crash;
+            # its continuous-score line simply doesn't exist yet until read is re-run.
+            per_layer_word_scores = rec["lens_scores_per_layer"][str(layers[0])]
+            if word not in per_layer_word_scores:
+                continue
             ys = [rec["lens_scores_per_layer"][str(l)][word]["max_logprob"] for l in layers]
             if all(y is None for y in ys):
                 continue
@@ -584,8 +956,12 @@ def main(stage: str):
         _run_read()
     elif stage == "plot":
         _run_plot()
+    elif stage == "read_conditions":
+        _run_read_conditions()
+    elif stage == "plot_conditions":
+        _run_plot_conditions()
     else:
-        raise ValueError(f"unknown stage {stage!r}; one of diagnose/read/plot")
+        raise ValueError(f"unknown stage {stage!r}; one of diagnose/read/plot/read_conditions/plot_conditions")
 
 
 if __name__ == "__main__":

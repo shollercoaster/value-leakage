@@ -132,6 +132,89 @@ judge-stage results before proceeding, per the applicant's own sequencing.
 
 ## Experiment 9 — J-lens internals readout
 
-**Status: NOT STARTED.** Sequenced after Experiment 8 per `EXPERIMENTS_NEEL_NANDA.md`
-§2.2 — Experiment 8's most important positions are meant to directly inform which positions
-are worth spending the rented-GPU hour reading here.
+**Status: COMPLETE (single flagship trace, three positions, six reads).** Ran on a fresh
+RunPod H200 pod (no cached volume from the original Experiment 7 session existed), following
+`EXPERIMENT_9_RUNBOOK.md`. Real infrastructure and dependency problems hit and fixed along the
+way are logged in `BUDGET_neel.md`'s Experiment 9 entry, not repeated here — this entry covers
+results only. **Started from what hypothesis:** Experiment 7's first pass (`FINDINGS.md`) found
+an incentive/reward concept cluster active at "unbiased-claim" positions, but that result was
+confounded — the literal word was already sitting in the text right before the cut, so a plain
+next-token predictor would show the same thing. Experiment 9 exists to re-test this with a
+matched plain-logit-lens control and an explicit verbatim-word confound check at every
+position, per `EXPERIMENTS_NEEL_NANDA.md` §4.
+
+**Positions read:** the three markers Experiment 8 flagged as behaviorally most important on
+the flagship trace (`runs/qwen3.5-122b-a10b_20260815_030702/above_good.json`, row 43) — marker
+2813 (numeric-assumption, largest resampling shift, 0.157 threshold-units), marker 10305
+(reconsideration "Decision:", second-largest, 0.070), marker 19338 (reconsideration, cleanest
+confirmed attractor-holds case, 0.057) — each read at both entry (just before the position) and
+exit (just after it resolves), six reads total.
+
+**Main result — mixed, not clean, reported as such:**
+- **The confound check passed cleanly at all six positions**: no pre-registered or exploratory
+  tracked word appears verbatim, at a word boundary, anywhere in the 300 characters of text
+  immediately before any of the six cut points. Whatever the lens shows below, it is not simply
+  reading back a word the model just wrote.
+- **No blanket "the lens just reads everything higher" artifact.** Checked directly across all
+  18 tracked words at all 6 positions (108 word-position pairs): lens-minus-plain-control
+  differences are roughly evenly split between positive and negative, not uniformly positive.
+  This matters because it means the specific positive hits below are not an artifact of the
+  lens being generically noisier or higher-scoring than the plain control.
+- **Behavioral importance (Experiment 8) and internal signal strength (Experiment 9)
+  do NOT converge on this single trace.** Marker 2813 — the position with the LARGEST
+  behavioral shift — showed the WEAKEST peak internal concept score of the three. Markers
+  10305 and 19338, with smaller behavioral shifts, showed stronger internal signal. This is
+  the opposite of the "clean, quotable" convergence result the design document flagged as the
+  strongest possible finding — reported as a real null on convergence, at n=3 positions, not
+  smoothed over.
+- **One position clears the full pre-registered "hidden concept" bar** (§4.3: lens beats plain
+  control, word not verbatim in preceding text, signal at an earlier/more-prominent layer):
+  marker 10305, exit ("Decision: I need to provide one number"). The pre-registered word
+  "bias" reaches log-probability -5.197 in the J-lens at layer 36 (0-indexed, matched to the
+  plain control's own convention after the indexing fix below) — the plain-logit-lens control's
+  best "bias" reading anywhere is -8.200, and "bias" never once ranks in the plain control's
+  own top-20 at any layer, while it does rank in the J-lens's top-20 starting at layer 36. Two
+  other bias/incentive-cluster words ("unbiased" +2.300, "reward" +2.247 lens-over-plain) are
+  also elevated at this same position, so it isn't a single-word fluke.
+- **Two more positions show a weaker, continuous-depth-only version of the same pattern**:
+  marker 2813 exit ("bias", lens -7.968 vs. plain -10.721) and marker 19338 exit ("incentiv",
+  lens -6.053 vs. plain -9.720) — lens clearly exceeds the plain control by raw log-probability
+  at both, but neither word cracks the top-20 in either the lens or the control, so these two
+  only support the weaker "continuous scoring surfaces something top-k depth would miss"
+  reading (directly testing, and here supporting, sub-experiment 1's own premise), not the full
+  "hidden concept" claim.
+- **Entry-vs-exit did not show a dip/respike shape** — it showed a monotonic rise from entry to
+  exit at all three positions (steepest for marker 10305: -8.8 to -5.2). This is a real
+  limitation of what got measured, not a null on the underlying question: the design called for
+  reading entry and exit of the reconsideration, which only brackets the episode's two
+  endpoints, not a third point mid-doubt — so a genuine dip mid-episode, if one exists, could
+  not show up in this chart. Worth a follow-up read at a mid-episode position before drawing
+  any conclusion about dip/respike shape specifically.
+
+**A real bug caught before it reached results, not after:** the `diagnose` stage's own
+plain-logit-lens layer numbering was one-indexed (`hidden_states[1:]` enumerated from 1) while
+`jacobian-lens`'s own convention, confirmed directly by reading `jlens/lens.py` rather than
+assumed, is zero-indexed (`model.layers[L]`, `final_layer = model.n_layers - 1`). Left as
+found, every lens-vs-plain "layer of first prominence" comparison above would have been
+silently off by exactly one layer. Fixed in `jlens_experiment9.py` before the paid `read` stage
+ran, with the reasoning recorded in the code itself.
+
+**Limitations, stated plainly, not buried:** single flagship trace, three positions, one model
+— this is exploratory groundwork on `n=1`, not a validated pattern; the pre-registered word
+list and the top-20/continuous-scoring convention are carried over unchanged from Experiment
+7's own list, not re-tuned after seeing these results; the entry/exit dip-respike test as
+actually implemented can only show a monotonic trend between two endpoints, not a true
+mid-episode dip, per the note above; and per this project's own recurring caveat, none of this
+bears on Claude at all — Qwen's real internal activations are read directly here, which is only
+possible because Qwen is open-weight.
+
+**Figures:** `runs/qwen3.5-122b-a10b_e9_jlens_20260904/concept_scores_by_layer.png`,
+`heatmap_e9_marker2813.png`, `heatmap_e9_marker10305.png`, `heatmap_e9_marker19338.png` (split
+one-per-marker and redrawn with much larger cells/fonts after the first combined-file version
+was checked and found unreadable -- verified by cropping the actual saved PNG at full
+resolution, not just by the intended figure-size math), `entry_vs_exit_e9.png`,
+`convergence_e9.png`. Raw data in `results_e9.json`
+and `config_e9.json` in the same directory.
+
+**Cost:** see `BUDGET_neel.md`'s Experiment 9 entry — tracked in GPU-hours (~$2-3.50), not
+against the $10/$15 Anthropic-side ledger, per that file's own convention.
