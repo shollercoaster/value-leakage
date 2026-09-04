@@ -11,8 +11,10 @@ kept separately; ask if you want the pointer to it.*
 *Status at time of writing: the first behavioral experiment (a deep dive on one trace) is
 complete. A second, smaller behavioral experiment across nine more traces is running now
 (current results below use the completed trace only, updated portions marked). The
-interpretability experiment is designed and coded, not yet run. This document will be updated
-again once those finish.*
+interpretability experiment (Sections 7-8) is complete for the flagship trace, plus a partial
+comparison against unincentivized and oppositely-favored traces; a fuller version of that
+comparison — more positions, a genuine mid-episode reading — is possible but not yet decided
+on. This document will be updated again once the nine-trace behavioral run finishes.*
 
 ---
 
@@ -76,11 +78,19 @@ matter what specific doubt reopens it.
 A second, smaller run extending this same test across nine more traces — a mix of the neutral,
 unincentivized version of the question and both bet framings — is in progress as of this
 writing, to check whether the pattern above holds beyond one trace. A follow-up experiment,
-designed and ready but not yet run, will read the model's internal activations directly at the
-exact three points this behavioral test flagged as most important, applying stronger controls
-than the earlier internals attempt used, to check whether the same positions that matter
-behaviorally also show something distinctive internally — the strongest possible result this
-whole line of work is built to find.
+applying stronger controls than the earlier internals attempt used, has now read the model's
+internal activations directly at the exact three points the behavioral test above flagged as
+most important. The strongest possible result — the same position mattering under both the
+behavioral test and the internal one — did not appear: the position with the largest effect on
+the final answer showed the weakest internal signal of the three. But at a different one of the
+three, the point where the model commits to its final number, a bias-related concept is read
+internally with dramatically higher confidence than the model's own literal next-word
+prediction would suggest, clearing every control set in advance for calling this a genuinely
+hidden signal rather than the model simply continuing a word it just wrote. A follow-up
+comparison against the model's unincentivized and oppositely-favored traces found the same
+signal at an equivalent commitment point to be roughly twenty times weaker there — real, if
+still single-position, evidence that this specific signal tracks the incentive itself, not just
+what any commitment point looks like internally in this model.
 
 ## 1. Background: A Test Case Where the Bias Has No Legitimate Cause
 
@@ -200,12 +210,15 @@ not depend on trusting a lens's internal readout at all: if a specific sentence 
 reasoning were different, would the final answer actually change?
 
 Two complementary tests follow from this. The first, described in full below, perturbs real
-reasoning traces directly and measures the effect on the final answer. The second, designed but
-not yet run, returns to reading internal activations — this time at the exact positions the
-first test identifies as behaviorally important, with stronger controls than the earlier
-attempt used. The strongest possible outcome would be convergence: the same positions in a
-trace mattering under both the behavioral test and the internal one. That is the single result
-this whole extension is organized to look for.
+reasoning traces directly and measures the effect on the final answer. The second returns to
+reading internal activations — this time at the exact positions the first test identifies as
+behaviorally important, with stronger controls than the earlier attempt used, described in
+Sections 7 and 8. The strongest possible outcome would have been convergence: the same
+positions in a trace mattering under both the behavioral test and the internal one. That
+convergence did not appear on this single trace — a real result, reported carefully in Section
+8 rather than smoothed over — though a different, more targeted finding did: one position's
+internal signal survives every control applied and tracks the incentive specifically, rather
+than appearing at any commitment point regardless of framing.
 
 ## 4. Method: Does Perturbing a Sentence Change the Answer?
 
@@ -327,7 +340,109 @@ A second experiment, extending the same test across nine additional traces — t
 plain question, and both bet framings — to check whether the pattern above generalizes beyond
 one trace, is running as of this writing and will be added to this document once complete.
 
-## 7. What Was Verified By Hand
+## 7. Method: Reading Internal Activations At the Positions That Mattered Behaviorally
+
+The behavioral test above answers what happens to the final answer when a sentence changes; it
+says nothing about what the model's internal state actually contains at that same sentence,
+independent of what eventually gets written down. A separate technique, developed at Anthropic
+and previously used to catch models expressing something internally before ever saying it
+aloud, addresses this directly: it decodes a model's intermediate internal representations into
+the vocabulary the model would use to describe them, at any chosen point in a single forward
+pass over already-written text. No new generation is needed — only one pass reading what the
+model's internal state was "leaning toward" saying at each layer of processing, at a point in
+the reasoning already on record.
+
+An earlier attempt at this technique, described in Section 2 above, ran into a specific
+problem: at the positions where the model asserts its own unbiasedness, incentive- and
+bias-related concepts did show up in this internal reading, but on close inspection the effect
+was mostly a mirage — the internal readout was simply reflecting the literal word the model had
+just finished writing, the same thing an ordinary next-word predictor would show for free. Only
+one data point survived a stricter check, too thin on its own to build anything on.
+
+This follow-up applies four checks together at each position, rather than reporting any one in
+isolation, at the exact positions Section 6's behavioral test had already flagged as most
+important on the flagship trace: the numeric-assumption sentence with the largest effect on the
+final answer, and two reconsideration points, including the one shown to be a stable attractor.
+First, a continuous measure of how strongly a tracked word is represented at every layer, rather
+than only checking whether it cracks a fixed top-ten or top-twenty list — a coarser check that
+could hide a real but modest signal entirely. Second, a matched control built directly from the
+model's own literal next-token prediction, run through the identical decoding step, so that
+anything the internal reading shows can be checked against what a much simpler technique would
+already reveal for free. Third, a direct search of the text immediately preceding the read point
+for the tracked word itself, at a real word boundary, because a hit that is really just the
+model continuing a word it just wrote is not a hidden signal at all — this is the exact confound
+the earlier attempt fell into. Fourth, which layer of processing a signal first becomes visible
+at, checked for both the real reading and its plain control, so that a claim that something is
+represented before it is said can be examined layer by layer rather than asserted from a single
+late-layer glance.
+
+A later addition extended this same test to two more, differently-framed versions of the same
+commitment point and the same numeric-assumption point, drawn from existing unincentivized and
+oppositely-favored traces already on hand from the original experiment — no new model
+generation was needed for this either. Read on its own, a position on the flagship trace can
+only answer "is something present here"; read against the same kind of position in a
+differently-framed trace, the comparison can additionally answer "is whatever is present here
+specific to the version of the question that puts a moral stake on the answer, or would it show
+up regardless."
+
+## 8. Results: Does the Internal Signal Match What Matters Behaviorally?
+
+Two checks were run before trusting anything else. First, whether the tracked words simply show
+up verbatim in the text just before each read point, which would make any reading meaningless on
+its own — none did, at any of the fourteen positions read across the flagship trace and its
+comparison traces. Second, whether the internal reading is simply noisier or higher-scoring than
+its plain control everywhere, which would make any single positive result meaningless too —
+checked directly across all eighteen tracked words at every position, the differences run in
+both directions roughly evenly, not uniformly toward the internal reading, so a genuine positive
+result at a specific position is informative rather than an artifact of the tool itself.
+
+The headline hope going in — that the position mattering most to the final answer would also
+show the strongest internal signal — did not hold. The numeric-assumption sentence with the
+largest behavioral effect showed the weakest internal signal of the three positions tested; the
+two reconsideration points, with smaller behavioral effects, showed stronger ones. Reported here
+as a real null rather than smoothed over, since a well-characterized failure to converge is
+itself informative about the limits of reading internal state this way.
+
+One position did clear every bar set in advance for calling something a genuinely hidden
+concept. At the point where the model commits to its final number — "Decision: I need to
+provide one number" — the word "bias" is read with dramatically higher confidence internally
+than the model's own literal next-token prediction would suggest, a gap of roughly three
+natural-log units, corresponding to about twenty times more probability mass than the plain
+control assigns the same word at the same point. It ranks among the internal reading's twenty
+most likely completions from partway through the model's layers onward; it never once reaches
+that rank in the plain control, at any layer. And it does not appear anywhere in the text
+immediately before the read point, ruling out the exact confound that undermined the earlier
+attempt. Two related words, "unbiased" and "reward," are elevated at this same position too, so
+this does not rest on one word alone. Two further positions show a smaller version of the same
+pattern — the internal reading exceeds its plain control by a clear margin, though neither
+position's word reaches the top-twenty threshold in either reading — direct support for the idea
+that a continuous measure can surface something a coarser, rank-based check would miss entirely,
+the specific methodological question that measure was designed to answer.
+
+Extending this same commitment-point comparison to the model's unincentivized and
+oppositely-favored traces produced the most useful single result of this whole extension: at an
+equivalent "decision" point in those traces, the same internal signal is roughly twenty to
+twenty-five times weaker than at the incentivized trace's own commitment point. This is genuine,
+if still single-position, evidence that the strong internal reading above is not simply what any
+commitment point looks like internally in this model, but something specific to the version of
+the question with a moral stake attached. The equivalent comparison at the numeric-assumption
+position does not tell the same clean story — the unincentivized comparison trace showed a
+stronger internal reading there than the original incentivized trace did, the opposite of what a
+simple version of the hypothesis would predict. Because that particular pair of positions was
+matched by where it falls in the reasoning rather than by topic, the most likely explanation is
+that the specific comparison sentence happened to raise bias-adjacent concepts for reasons of
+its own content rather than the incentive itself — a real limitation of this specific
+comparison, reported as such rather than quietly left out of the count.
+
+A planned check for whether the internal signal dips while the model is voicing a losing
+candidate and recovers once it resettles could not be properly run as designed: only the two
+endpoints of each reconsideration episode were read, which can show whether the signal ends up
+higher or lower than it started but cannot show a dip in between. Both reconsideration points
+tested showed the signal rising from start to end rather than dipping — a real result about
+those two endpoints, but not the dip-and-recovery pattern the check was built to find. A genuine
+mid-episode reading would be needed before drawing any conclusion about that specific shape.
+
+## 9. What Was Verified By Hand
 
 Consistent with the view that sanity-checking one's own process is as important as the results
 themselves, several concrete checks were performed and are recorded here rather than merely
@@ -354,8 +469,24 @@ asserted:
 - The secondary language-model reader used for the harder-to-parse final answers was checked
   against a stronger model on a random sample of its readings twice, once for each round of this
   experiment, agreeing on every single case both times.
+- The internal-activations tool's own layer-numbering convention was confirmed by reading its
+  source code directly rather than assumed from its documentation, which caught a real,
+  otherwise-invisible bug: a control measurement built independently for this experiment was
+  numbering layers one-off from the tool's own convention. Left uncorrected, every claim below
+  about which layer a concept first becomes visible at would have been silently wrong by exactly
+  one layer. Fixed before any of the real, paid readings were taken, not after.
+- The first attempt at visualizing which words the internal reading favored at each layer was
+  checked at full resolution, not just trusted from the code that generated it, and found
+  genuinely unreadable — long words ran outside their intended cells into neighboring ones. The
+  fix was checked the same way, by comparing the same region of the same image before and after,
+  confirming the fix actually worked rather than assuming it did from the code alone.
+- When a later question arose about whether the internal-reading visualizations might have
+  silently changed between two points in the process, this was checked directly rather than
+  dismissed: the underlying saved data's own file timestamp was confirmed to predate every
+  visualization redraw, and a like-for-like image comparison came back identical, confirming the
+  visualizations were stable throughout rather than asserting it from process alone.
 
-## 8. Limitations
+## 10. Limitations
 
 The comparison-group sample — three continuations per position, before the follow-up
 correction — is small enough to be genuinely unstable, demonstrated directly above rather than
@@ -372,3 +503,18 @@ this writing. Every claim in this document and its predecessors about what a Cla
 internal reasoning process, which is never exposed directly — this applies to every
 Claude-model result described in section 2, though not to the open-weight model's internal
 activations read directly in the interpretability work, which are read as-is.
+
+The interpretability results in Sections 7-8 carry their own, separate set of limitations,
+worth stating with the same directness as the behavioral ones above. They rest on one trace and
+three positions — exploratory groundwork, not a validated pattern, and the tracked word list
+was carried over unchanged from an earlier experiment rather than re-tuned after seeing these
+results, which is a deliberate discipline rather than an oversight. The comparison against
+unincentivized and oppositely-favored traces covers only two of the three position-types tested
+on the flagship trace, and the numeric-assumption half of that comparison used positions matched
+by where they sit in the reasoning rather than by topic, which produced a genuinely harder result
+to interpret at that position-type specifically, reported in Section 8 rather than dropped. The
+planned test for whether an internal signal dips during a moment of doubt and recovers afterward
+could not be run as designed, for the reason given there, and would need a genuine mid-episode
+reading to test properly. And as throughout this document, this interpretability work is only
+possible on the open-weight model — nothing here reads Claude's internal activations directly,
+since no comparable access exists for it.

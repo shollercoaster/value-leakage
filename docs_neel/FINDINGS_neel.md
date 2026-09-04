@@ -130,195 +130,191 @@ with no other changes.
 above_good), reused from existing `runs/` data, ~4–6 positions per trace. Waiting on Tier 1's
 judge-stage results before proceeding, per the applicant's own sequencing.
 
+---
+
 ## Experiment 9 — J-lens internals readout
 
-**Status: COMPLETE (single flagship trace, three positions, six reads).** Ran on a fresh
-RunPod H200 pod (no cached volume from the original Experiment 7 session existed), following
-`EXPERIMENT_9_RUNBOOK.md`. Real infrastructure and dependency problems hit and fixed along the
-way are logged in `BUDGET_neel.md`'s Experiment 9 entry, not repeated here — this entry covers
-results only. **Started from what hypothesis:** Experiment 7's first pass (`FINDINGS.md`) found
-an incentive/reward concept cluster active at "unbiased-claim" positions, but that result was
-confounded — the literal word was already sitting in the text right before the cut, so a plain
-next-token predictor would show the same thing. Experiment 9 exists to re-test this with a
-matched plain-logit-lens control and an explicit verbatim-word confound check at every
-position, per `EXPERIMENTS_NEEL_NANDA.md` §4.
+Two runs so far, in this order: a first pass on the flagship trace alone (3 positions, 6
+reads), then a Tier A extension adding baseline/below_good comparison positions (4 more
+positions, 8 more reads) once the first pass identified the single biggest open question.
+Each is recorded below in the format `CLAUDE_neel.md` §5 specifies: what hypothesis it started
+from, which hypothesis it moved, the main result, interesting notes, and what it cost.
 
-**Positions read:** the three markers Experiment 8 flagged as behaviorally most important on
-the flagship trace (`runs/qwen3.5-122b-a10b_20260815_030702/above_good.json`, row 43) — marker
-2813 (numeric-assumption, largest resampling shift, 0.157 threshold-units), marker 10305
-(reconsideration "Decision:", second-largest, 0.070), marker 19338 (reconsideration, cleanest
-confirmed attractor-holds case, 0.057) — each read at both entry (just before the position) and
-exit (just after it resolves), six reads total.
+### First pass — flagship trace only, 3 positions, 6 reads
 
-**Main result — mixed, not clean, reported as such:**
-- **The confound check passed cleanly at all six positions**: no pre-registered or exploratory
-  tracked word appears verbatim, at a word boundary, anywhere in the 300 characters of text
-  immediately before any of the six cut points. Whatever the lens shows below, it is not simply
-  reading back a word the model just wrote.
-- **No blanket "the lens just reads everything higher" artifact.** Checked directly across all
-  18 tracked words at all 6 positions (108 word-position pairs): lens-minus-plain-control
-  differences are roughly evenly split between positive and negative, not uniformly positive.
-  This matters because it means the specific positive hits below are not an artifact of the
-  lens being generically noisier or higher-scoring than the plain control.
-- **Behavioral importance (Experiment 8) and internal signal strength (Experiment 9)
-  do NOT converge on this single trace.** Marker 2813 — the position with the LARGEST
-  behavioral shift — showed the WEAKEST peak internal concept score of the three. Markers
-  10305 and 19338, with smaller behavioral shifts, showed stronger internal signal. This is
-  the opposite of the "clean, quotable" convergence result the design document flagged as the
-  strongest possible finding — reported as a real null on convergence, at n=3 positions, not
-  smoothed over.
-- **One position clears the full pre-registered "hidden concept" bar** (§4.3: lens beats plain
-  control, word not verbatim in preceding text, signal at an earlier/more-prominent layer):
-  marker 10305, exit ("Decision: I need to provide one number"). The pre-registered word
-  "bias" reaches log-probability -5.197 in the J-lens at layer 36 (0-indexed, matched to the
-  plain control's own convention after the indexing fix below) — the plain-logit-lens control's
-  best "bias" reading anywhere is -8.200, and "bias" never once ranks in the plain control's
-  own top-20 at any layer, while it does rank in the J-lens's top-20 starting at layer 36. Two
-  other bias/incentive-cluster words ("unbiased" +2.300, "reward" +2.247 lens-over-plain) are
-  also elevated at this same position, so it isn't a single-word fluke.
-- **Two more positions show a weaker, continuous-depth-only version of the same pattern**:
-  marker 2813 exit ("bias", lens -7.968 vs. plain -10.721) and marker 19338 exit ("incentiv",
-  lens -6.053 vs. plain -9.720) — lens clearly exceeds the plain control by raw log-probability
-  at both, but neither word cracks the top-20 in either the lens or the control, so these two
-  only support the weaker "continuous scoring surfaces something top-k depth would miss"
-  reading (directly testing, and here supporting, sub-experiment 1's own premise), not the full
-  "hidden concept" claim.
-- **Entry-vs-exit did not show a dip/respike shape** — it showed a monotonic rise from entry to
-  exit at all three positions (steepest for marker 10305: -8.8 to -5.2). This is a real
-  limitation of what got measured, not a null on the underlying question: the design called for
-  reading entry and exit of the reconsideration, which only brackets the episode's two
-  endpoints, not a third point mid-doubt — so a genuine dip mid-episode, if one exists, could
-  not show up in this chart. Worth a follow-up read at a mid-episode position before drawing
-  any conclusion about dip/respike shape specifically.
+**Status: COMPLETE.** Ran on a fresh RunPod H200 (no cached volume from the original
+Experiment 7 session existed — full setup documented in `BUDGET_neel.md`, not repeated here).
 
-**A real bug caught before it reached results, not after:** the `diagnose` stage's own
-plain-logit-lens layer numbering was one-indexed (`hidden_states[1:]` enumerated from 1) while
-`jacobian-lens`'s own convention, confirmed directly by reading `jlens/lens.py` rather than
-assumed, is zero-indexed (`model.layers[L]`, `final_layer = model.n_layers - 1`). Left as
-found, every lens-vs-plain "layer of first prominence" comparison above would have been
-silently off by exactly one layer. Fixed in `jlens_experiment9.py` before the paid `read` stage
-ran, with the reasoning recorded in the code itself.
+- **Hypothesis started from:** Experiment 7's first J-lens pass (`FINDINGS.md`, original
+  project) found an incentive/reward concept cluster active at "unbiased-claim" positions, but
+  that result was confounded — the literal word was already sitting in the text right before
+  the cut, so a plain next-token predictor would show the same thing. This pass asks whether a
+  genuine hidden-concept signal survives once that confound is actually controlled for, at the
+  three positions Experiment 8 flagged as behaviorally most important on the flagship trace:
+  marker 2813 (numeric-assumption, largest resampling shift, 0.157 threshold-units), marker
+  10305 (reconsideration, "Decision:", second-largest, 0.070), marker 19338 (reconsideration,
+  cleanest confirmed attractor-holds case, 0.057) — each read at entry (just before the
+  position) and exit (just after it resolves).
+- **Which hypothesis it moved:** the "confounded, therefore nothing real is there" reading from
+  Experiment 7 is no longer tenable as a blanket explanation — one position (marker 10305)
+  clears every leg of the pre-registered hidden-concept test, confound-free. But the
+  companion hope — that behavioral importance (Experiment 8) and internal signal strength
+  (Experiment 9) would converge on the same position — moved to a real null: the position with
+  the *largest* behavioral shift (2813) had the *weakest* internal signal of the three tested.
+  The dip/respike sub-hypothesis (does a concept dip during doubt and respike at recommitment)
+  could not be properly tested as implemented — see main result.
+- **Main result:**
+  - **Confound check passed cleanly at all six reads.** No pre-registered or exploratory
+    tracked word appears verbatim, at a word boundary, in the 300 characters of text
+    immediately before any of the six cut points.
+  - **No blanket "the lens reads everything higher" artifact.** Checked directly across all 18
+    tracked words at all 6 positions (108 word-position pairs): lens-minus-plain-control
+    differences are a genuine mix of positive and negative, not uniformly positive — the
+    positive hits below are not an artifact of the lens being generically noisier than the
+    plain-logit-lens control.
+  - **Behavioral importance and internal signal do not converge, at n=3.** Marker 2813 (largest
+    behavioral shift) showed the weakest peak internal score (-7.968); markers 10305 and 19338,
+    with smaller behavioral shifts, showed stronger internal signal (-5.197 and -6.053
+    respectively). The opposite of the "clean, quotable" convergence result the design document
+    flagged as the strongest possible finding — reported as a real null, not smoothed over.
+  - **Marker 10305, exit, clears the full pre-registered hidden-concept bar.** The word "bias"
+    reaches log-probability **-5.197** in the J-lens at layer 36 — the plain-logit-lens
+    control's best "bias" reading anywhere is **-8.200**, and "bias" never once ranks in the
+    control's own top-20 at any layer, while it does rank in the lens's top-20 starting at
+    layer 36. Two related words ("unbiased" +2.300, "reward" +2.247 lens-over-plain) are also
+    elevated at this same position, so it is not a single-word fluke.
+  - **Two more positions show a weaker, continuous-depth-only version of the same pattern:**
+    marker 2813 exit ("bias", lens -7.968 vs. plain -10.721) and marker 19338 exit ("incentiv",
+    lens -6.053 vs. plain -9.720) — lens clearly exceeds the plain control by raw
+    log-probability at both, but neither word cracks the top-20 in either the lens or the
+    control. This directly tests, and supports, sub-experiment 1's own premise: continuous
+    scoring surfaces something a coarser top-k-depth read would call a flat null.
+  - **Entry-vs-exit showed a monotonic rise, not a dip/respike shape**, at all three positions
+    (steepest at marker 10305: -8.8 to -5.2). This is a real limitation of what was measured,
+    not a null on the underlying question — only the two endpoints of each reconsideration
+    episode were read, not a genuine mid-doubt point, so a real dip in the middle (if one
+    exists) has no way to show up in a two-point comparison.
+- **Interesting notes:**
+  - A real bug caught and fixed before it reached results, not after: the `diagnose` stage's
+    plain-logit-lens layer numbering was one-indexed (`hidden_states[1:]` enumerated from 1)
+    while `jacobian-lens`'s own convention, confirmed by reading `jlens/lens.py` directly rather
+    than assumed, is zero-indexed (`model.layers[L]`, `final_layer = model.n_layers - 1`). Left
+    as found, every lens-vs-plain "layer of first prominence" comparison would have been
+    silently off by exactly one layer. Fixed before the paid `read` stage ran.
+  - The `diagnose` stage's own inline comment claimed a specific confound-check result "should
+    be True" and the actual run printed False — checked directly against the real trace text
+    rather than assumed to be a bug: marker 2813 is a numeric-assumption sentence about spot
+    size/surface area, and genuinely does not mention "threshold" anywhere in the preceding 400
+    characters. The code was correct; the comment's assumption was wrong. Left as a documented
+    non-issue rather than silently patched away.
+  - The heatmap visualizations went through several redraws before landing on a working design:
+    the first combined 6-record file was checked and found unreadable at full resolution
+    (verified by cropping the actual saved PNG, not just trusting the intended figure-size
+    math); splitting one-file-per-marker with a larger fixed font size fixed legibility but
+    caused long words ("submissions," "certainty," "biases") to overflow their cells; the final
+    fix auto-shrinks each word's font individually to its own cell's *measured* rendered pixel
+    width (via matplotlib's real renderer, not an estimated character-width formula), which
+    guarantees every word fits without truncating any of them — verified again by cropping the
+    same region of the same file before and after the fix.
+  - "Risk" was tried as an additional exploratory highlight word after it recurred prominently
+    near decision-point positions, then reverted at the applicant's request: it is common
+    decision-making vocabulary, not a scarce signal, so highlighting it added clutter rather
+    than surfacing anything. This only ever affected heatmap border-highlighting, never the
+    underlying decoded words, which come from the model's real output regardless of what is in
+    the tracked-word list — confirmed directly by checking that `results_e9.json`'s
+    modification timestamp predates every heatmap regeneration, so the displayed content was
+    never at risk of silently changing between redraws.
+- **Limitations:** single flagship trace, three positions, one model — exploratory groundwork
+  at n=1, not a validated pattern. The pre-registered word list and top-20/continuous-scoring
+  convention are carried over unchanged from Experiment 7's own list, not re-tuned after seeing
+  these results. Per this project's recurring caveat, none of this bears on Claude — Qwen's
+  real internal activations are read directly here, which is only possible because Qwen is
+  open-weight.
+- **Figures:** `runs/qwen3.5-122b-a10b_e9_jlens_20260904/concept_scores_by_layer.png`,
+  `heatmap_e9_marker2813.png`, `heatmap_e9_marker10305.png`, `heatmap_e9_marker19338.png`,
+  `entry_vs_exit_e9.png`, `convergence_e9.png`. Raw data in `results_e9.json` and
+  `config_e9.json`, same directory.
+- **Cost:** tracked in GPU-hours, not the $10/$15 Anthropic-side ledger (unaffected, still
+  ~$2.52) — see `BUDGET_neel.md` for the full setup/debugging cost accounting.
 
-**Limitations, stated plainly, not buried:** single flagship trace, three positions, one model
-— this is exploratory groundwork on `n=1`, not a validated pattern; the pre-registered word
-list and the top-20/continuous-scoring convention are carried over unchanged from Experiment
-7's own list, not re-tuned after seeing these results; the entry/exit dip-respike test as
-actually implemented can only show a monotonic trend between two endpoints, not a true
-mid-episode dip, per the note above; and per this project's own recurring caveat, none of this
-bears on Claude at all — Qwen's real internal activations are read directly here, which is only
-possible because Qwen is open-weight.
+### Tier A — cross-condition comparison (baseline/below_good analogs)
 
-**Figures:** `runs/qwen3.5-122b-a10b_e9_jlens_20260904/concept_scores_by_layer.png`,
-`heatmap_e9_marker2813.png`, `heatmap_e9_marker10305.png`, `heatmap_e9_marker19338.png` (split
-one-per-marker and redrawn with much larger cells/fonts after the first combined-file version
-was checked and found unreadable -- verified by cropping the actual saved PNG at full
-resolution, not just by the intended figure-size math), `entry_vs_exit_e9.png`,
-`convergence_e9.png`. Raw data in `results_e9.json`
-and `config_e9.json` in the same directory.
+**Status: COMPLETE for 2 of the flagship's 3 position-types.** Reuses the same
+already-downloaded model and lens (no re-download, no new API spend — `baseline.json`/
+`below_good.json` for this exact model already existed on disk from the original shipped run).
 
-**Cost:** see `BUDGET_neel.md`'s Experiment 9 entry — tracked in GPU-hours (~$2-3.50), not
-against the $10/$15 Anthropic-side ledger, per that file's own convention.
+- **Hypothesis started from:** the first pass's single biggest open question — is marker
+  10305's clean hidden-concept hit specific to the incentivized `above_good` condition, or does
+  the same internal signal appear at any structurally similar commitment point regardless of
+  condition? Comparison positions were found mechanically, not hand-picked, so the method is
+  checkable: the **reconsideration analog** (mirrors marker 10305) by literal string search for
+  a `"Decision:"` heading, confirmed to recur as generic Fermi-estimate boilerplate regardless
+  of condition (present in 12/20 baseline rows and 17/20 below_good rows sampled) — baseline's
+  analog is row 43 (same row index as the flagship, tried first for consistency), char
+  18583-18652; below_good row 43 could not be used (its `reasoning` field never exists — the
+  original generation call hit a rate-limit error and was left as
+  `{"i": 43, "error": "RetryError...RateLimitError"}`), so below_good row 0 was used instead
+  (the first row with a valid `reasoning` field, a fixed rule rather than a search for the
+  best-looking row), char 23341-23378. The **numeric-assumption analog** (mirrors marker 2813)
+  was found by relative position, not topic match — marker 2813 sits at 12.77% through the
+  flagship's reasoning; the same fraction was located in each condition's row and snapped to
+  the nearest full sentence boundary, deliberately not searched for a topically similar
+  sentence, since that would itself be a form of cherry-picking dressed up as rigor. The
+  19338-type analog and a genuine dip/respike midpoint read were both scoped out of this round
+  to keep it tractable — 8 new reads total (4 positions × entry/exit), not 12 or more.
+- **Which hypothesis it moved:** for the 10305-type (the one position that mattered), the
+  "condition-specific" reading gained real, if single-position, support. For the 2813-type, the
+  same simple story does not hold — see main result.
+- **Main result:**
 
-### Tier A — closing the no-baseline gap
+  | Position-type | Condition | Peak word (log-prob) | Confound in preceding text? |
+  |---|---|---|---|
+  | 10305-type ("Decision:") | baseline | incentiv (-8.171) | No |
+  | 10305-type | below_good | incentiv (-7.567) | No |
+  | 10305-type | **above_good (original)** | **bias (-5.197)** | No |
+  | 2813-type (numeric assumption) | baseline | unbiased (-9.069) | No |
+  | 2813-type | below_good | bias (-5.582) | No |
+  | 2813-type | above_good (original) | bias (-7.968) | No |
 
-**Status: COMPLETE (2 of the 3 flagship position-types, baseline + below_good).** The first
-pass above left the single biggest open question unanswered: is marker 10305's clean
-"hidden concept" hit specific to the incentivized `above_good` condition, or does the same
-internal signal show up at any structurally similar commitment point regardless of condition?
-This directly tests that, reusing the same already-downloaded model and lens (no re-download,
-no new API spend — `baseline.json`/`below_good.json` for this exact model already existed on
-disk from the original shipped run).
-
-**How the comparison positions were found (method, not manual cherry-picking, so it's
-checkable):**
-- **Reconsideration analog (mirrors marker 10305):** found by literal string search for a
-  `"Decision:"` heading. This exact phrase recurs as generic Fermi-estimate boilerplate
-  regardless of condition — confirmed directly, not assumed: present in 12/20 baseline rows
-  and 17/20 below_good rows sampled. Baseline's analog is row 43 (same row index as the
-  flagship, chosen first for consistency, and it happened to have a valid, well-structured
-  `"Decision:"` occurrence), char 18583-18652 (`"Decision:\n *   Population: 117,000 (GCF 2019
-  census)."`). below_good row 43 could not be used — its `reasoning` field never exists;
-  the original generation call for that row hit a rate-limit error and was left as
-  `{"i": 43, "error": "RetryError...RateLimitError"}`. below_good row 0 (the first row with a
-  valid `reasoning` field, a fixed rule rather than a search for the best-looking row) was
-  used instead, char 23341-23378 (`"Final Decision: 39,000,000."`).
-- **Numeric-assumption analog (mirrors marker 2813):** found by RELATIVE POSITION, not topic
-  match. Marker 2813 sits at 12.77% through the flagship's reasoning; the same fraction was
-  located in each condition's row, then snapped to the nearest full sentence boundary. This
-  deliberately does not search for a topically similar sentence (e.g. another spot-size
-  assumption) — doing that would itself be a form of cherry-picking dressed up as rigor.
-  Matching by structural position instead tests "what does internal state look like at a
-  comparable early assumption-building point," independent of the specific words used there.
-  The real consequence: the matched sentences differ meaningfully in topic across conditions
-  (baseline's landed on a sentence about calves/spot-merging factors, below_good's on a
-  sentence about whether "black spots" should be read literally or colloquially, above_good's
-  on "Average spot size: Variable") — this is a real limitation of this specific comparison,
-  not concealed by the method description.
-- **Scope actually covered:** only 2 of the flagship's 3 position-types (2813-type and
-  10305-type). The 19338-type (attractor-holds reconsideration) was deliberately left out of
-  this round to keep it tractable — 8 new reads total (4 positions x entry/exit), not 12.
-
-**Results, checked position by position:**
-
-| Position-type | Condition | Peak word (log-prob) | Confound in preceding text? |
-|---|---|---|---|
-| 10305-type ("Decision:") | baseline | incentiv (-8.171) | No |
-| 10305-type | below_good | incentiv (-7.567) | No |
-| 10305-type | **above_good (original)** | **bias (-5.197)** | No |
-| 2813-type (numeric assumption) | baseline | unbiased (-9.069) | No |
-| 2813-type | below_good | bias (-5.582) | No |
-| 2813-type | above_good (original) | bias (-7.968) | No |
-
-All six cross-condition reads pass the confound check cleanly, same as the original three.
-
-**The 10305-type comparison is the clean, useful result this round was built to get:**
-above_good's signal (-5.197) is roughly 2.4-3.0 log-probability units stronger than either
-baseline (-8.171) or below_good (-7.567) at the same structural position-type — baseline and
-below_good are close to each other and both clearly weaker than above_good. This is genuine,
-if single-position, support for the reading that marker 10305's internal signal is specific to
-the incentivized condition, not just "what any commitment point looks like in Qwen." This is
-the strongest piece of evidence Experiment 9 has produced so far for the original hidden-concept
-hypothesis, precisely because it survives a comparison it could easily have failed.
-
-**The 2813-type comparison does NOT cleanly support the same story, and is reported as a real
-complication, not smoothed over:** below_good's analog (-5.582) is actually the STRONGEST of
-all three conditions here — stronger even than above_good's own original position (-7.968),
-with baseline weakest (-9.069). If the hypothesis were simply "incentivized conditions activate
-bias-concepts more at this position-type," above_good should be strongest, not below_good. Given
-this comparison's positions were matched by relative structural position rather than topic (see
-above), the most likely explanation is that below_good's specific matched sentence (about
-whether "black spots" should be read literally) happens to make bias/unbiased-adjacent concepts
-more contextually available for reasons unrelated to the incentive itself — but this is a
-plausible interpretation, not a confirmed one, on a single data point. Reported honestly as a
-limitation of this specific comparison's method, not as evidence against the 10305-type result.
-
-**Visualizations added:**
-- `heatmap_e9_conditions_analog2813.png`, `heatmap_e9_conditions_analog10305.png` — same
-  style/mechanism as the original three (auto-fit cell text, red/orange flagged-word borders),
-  baseline's entry/exit stacked above below_good's entry/exit, J-lens vs. plain-control side by
-  side. Directly comparable against `heatmap_e9_marker2813.png`/`heatmap_e9_marker10305.png` to
-  see the above_good original side by side with its baseline/below_good analogs.
-- `condition_comparison_e9.png` — the chart this round was built to produce: peak tracked-word
-  log-probability (raw, not normalized, so directly comparable across bars) for each
-  position-type, three bars per group (baseline/below_good/above_good). This is the source of
-  the table above.
-
-**A note on a word that was tried and reverted:** "risk" was added to the exploratory word list
-after it recurred prominently in the heatmap at position-types related to decision-making, then
-removed at the applicant's request after seeing it highlighted everywhere — it recurs too
-generically (ordinary decision-making vocabulary, not a scarce/meaningful signal), so
-highlighting it added clutter rather than surfacing anything. Left as a code comment so this
-isn't retried the same way without a different reason. This affected only heatmap border
-highlighting, never the underlying decoded words themselves, which come straight from the
-model's real output regardless of what's in the tracked-word list.
-
-**Limitations specific to Tier A, on top of the ones already listed above:** still one row per
-condition (not multiple traces); the numeric-assumption comparison's positions differ in topic
-across conditions by construction (a real, not hidden, weakness of relative-position matching);
-the 19338-type comparison and the dip/respike midpoint fix (both part of the original Tier A
-proposal) were not done this round, to keep scope and cost tractable — a natural next increment
-if this direction is worth pursuing further.
-
-**Cost:** 8 new forward-pass reads (a few seconds each once the model — already cached on this
-pod — was loaded, ~40 seconds) plus the plotting/documentation work above. See `BUDGET_neel.md`
-for the session's real elapsed time and GPU-hour estimate.
+  All six new reads pass the confound check cleanly, same as the original three.
+  **The 10305-type comparison is the clean, useful result this round was built to get:**
+  above_good's signal (-5.197) is roughly 2.4-3.0 log-probability units stronger than either
+  baseline (-8.171) or below_good (-7.567), which sit close to each other and are both clearly
+  weaker than above_good. This is genuine, if single-position, support for the reading that
+  marker 10305's internal signal is specific to the incentivized condition rather than generic
+  to any commitment point — the strongest evidence this experiment has produced for the
+  original hidden-concept hypothesis, precisely because it survived a comparison it could
+  easily have failed. **The 2813-type comparison does not cleanly support the same story, and
+  is reported as a real complication, not smoothed over:** below_good's analog (-5.582) is
+  actually the strongest of all three conditions here — stronger even than above_good's own
+  original position (-7.968) — with baseline weakest (-9.069). If the hypothesis were simply
+  "incentivized conditions activate bias-concepts more at this position-type," above_good
+  should be strongest, not below_good. Given this comparison's positions were matched by
+  relative structural position rather than topic, the likely explanation is that below_good's
+  specific matched sentence (about whether "black spots" should be read literally or
+  colloquially) happens to make bias/unbiased-adjacent concepts more contextually available for
+  reasons unrelated to the incentive itself — a plausible interpretation, not a confirmed one,
+  on a single data point.
+- **Interesting notes:**
+  - A layout bug in the first draft of the new comparison chart (`condition_comparison_e9.png`)
+    was caught before finalizing: the x-axis labels used the long descriptive marker notes,
+    which overflowed into neighboring bars and off the visible axes; fixed by pulling the short
+    `kind` field (e.g. "reconsideration") from the already-saved records instead.
+  - When asked why the marker heatmaps looked different across regenerations, the concern was
+    checked directly rather than dismissed: `results_e9.json`'s file-modification timestamp
+    (19:13:31) predates every subsequent `--stage plot` call, and a same-region crop of the
+    same file before and after several regenerations came back pixel-identical. The apparent
+    difference was from comparing different files/regions across different verification
+    screenshots, not an actual change in content.
+- **Limitations specific to Tier A:** still one row per condition, not multiple traces; the
+  numeric-assumption comparison's matched positions differ in topic across conditions by
+  construction, a real (not hidden) weakness of relative-position matching; the 19338-type
+  comparison and the dip/respike midpoint fix were both left undone this round.
+- **Figures:** `heatmap_e9_conditions_analog2813.png`, `heatmap_e9_conditions_analog10305.png`
+  (same auto-fit/highlighting style as the original three, baseline's entry/exit stacked above
+  below_good's), `condition_comparison_e9.png` (source of the table above).
+- **Cost:** 8 new forward-pass reads (a few seconds each once the model, already cached on this
+  pod, was loaded — about 40 seconds). Total Experiment 9 GPU-hours across both the first pass
+  and Tier A, measured directly from the pod's own clock (not estimated): **68 minutes**,
+  roughly **$4.07-5.20** at $3.59-4.59/hour. Tracked separately from the $10 target/$15 ceiling
+  Anthropic-side ledger, which remains unchanged at ~$2.52 — see `BUDGET_neel.md`.
