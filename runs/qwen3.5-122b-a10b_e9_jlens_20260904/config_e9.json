@@ -1,0 +1,36 @@
+{
+  "experiment": 9,
+  "model": "qwen3.5-122b-a10b",
+  "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
+  "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
+  "flagship_condition": "above_good",
+  "flagship_row": 43,
+  "target_markers": {
+    "2813": "largest behavioral shift found in Experiment 8 (numeric_assumption)",
+    "10305": "second-largest behavioral shift (reconsideration, 'Decision:')",
+    "19338": "cleanest confirmed attractor-holds case (reconsideration)"
+  },
+  "pre_registered_words": [
+    "bias",
+    "manipulate",
+    "cheat",
+    "donation",
+    "threshold",
+    "influence"
+  ],
+  "exploratory_words": [
+    "dishonesty",
+    "dishonest",
+    "charity",
+    "lie",
+    "unfair",
+    "unbiased",
+    "incentiv",
+    "reward",
+    "奖励",
+    "激励",
+    "奖金",
+    "獎勵"
+  ],
+  "top_k_for_prominence": 20
+}

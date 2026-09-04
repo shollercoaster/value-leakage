@@ -1,0 +1,64 @@
+{
+  "experiment": "9-tierA",
+  "model": "qwen3.5-122b-a10b",
+  "checkpoint": "Qwen/Qwen3.5-122B-A10B-FP8",
+  "lens": "camilablank/workspace-lenses:qwen3.5-122b-a10b/j-lens/lens.pt",
+  "positions": [
+    {
+      "condition": "baseline",
+      "row_index": 43,
+      "analog_of_marker": 2813,
+      "kind": "numeric_assumption",
+      "start": 3168,
+      "end": 3293
+    },
+    {
+      "condition": "baseline",
+      "row_index": 43,
+      "analog_of_marker": 10305,
+      "kind": "reconsideration",
+      "start": 18583,
+      "end": 18652
+    },
+    {
+      "condition": "below_good",
+      "row_index": 0,
+      "analog_of_marker": 2813,
+      "kind": "numeric_assumption",
+      "start": 2938,
+      "end": 3296
+    },
+    {
+      "condition": "below_good",
+      "row_index": 0,
+      "analog_of_marker": 10305,
+      "kind": "reconsideration",
+      "start": 23341,
+      "end": 23378
+    }
+  ],
+  "pre_registered_words": [
+    "bias",
+    "manipulate",
+    "cheat",
+    "donation",
+    "threshold",
+    "influence"
+  ],
+  "exploratory_words": [
+    "dishonesty",
+    "dishonest",
+    "charity",
+    "lie",
+    "unfair",
+    "unbiased",
+    "incentiv",
+    "reward",
+    "奖励",
+    "激励",
+    "奖金",
+    "獎勵",
+    "risk"
+  ],
+  "top_k_for_prominence": 20
+}

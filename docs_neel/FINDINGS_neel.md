@@ -218,3 +218,107 @@ and `config_e9.json` in the same directory.
 
 **Cost:** see `BUDGET_neel.md`'s Experiment 9 entry — tracked in GPU-hours (~$2-3.50), not
 against the $10/$15 Anthropic-side ledger, per that file's own convention.
+
+### Tier A — closing the no-baseline gap
+
+**Status: COMPLETE (2 of the 3 flagship position-types, baseline + below_good).** The first
+pass above left the single biggest open question unanswered: is marker 10305's clean
+"hidden concept" hit specific to the incentivized `above_good` condition, or does the same
+internal signal show up at any structurally similar commitment point regardless of condition?
+This directly tests that, reusing the same already-downloaded model and lens (no re-download,
+no new API spend — `baseline.json`/`below_good.json` for this exact model already existed on
+disk from the original shipped run).
+
+**How the comparison positions were found (method, not manual cherry-picking, so it's
+checkable):**
+- **Reconsideration analog (mirrors marker 10305):** found by literal string search for a
+  `"Decision:"` heading. This exact phrase recurs as generic Fermi-estimate boilerplate
+  regardless of condition — confirmed directly, not assumed: present in 12/20 baseline rows
+  and 17/20 below_good rows sampled. Baseline's analog is row 43 (same row index as the
+  flagship, chosen first for consistency, and it happened to have a valid, well-structured
+  `"Decision:"` occurrence), char 18583-18652 (`"Decision:\n *   Population: 117,000 (GCF 2019
+  census)."`). below_good row 43 could not be used — its `reasoning` field never exists;
+  the original generation call for that row hit a rate-limit error and was left as
+  `{"i": 43, "error": "RetryError...RateLimitError"}`. below_good row 0 (the first row with a
+  valid `reasoning` field, a fixed rule rather than a search for the best-looking row) was
+  used instead, char 23341-23378 (`"Final Decision: 39,000,000."`).
+- **Numeric-assumption analog (mirrors marker 2813):** found by RELATIVE POSITION, not topic
+  match. Marker 2813 sits at 12.77% through the flagship's reasoning; the same fraction was
+  located in each condition's row, then snapped to the nearest full sentence boundary. This
+  deliberately does not search for a topically similar sentence (e.g. another spot-size
+  assumption) — doing that would itself be a form of cherry-picking dressed up as rigor.
+  Matching by structural position instead tests "what does internal state look like at a
+  comparable early assumption-building point," independent of the specific words used there.
+  The real consequence: the matched sentences differ meaningfully in topic across conditions
+  (baseline's landed on a sentence about calves/spot-merging factors, below_good's on a
+  sentence about whether "black spots" should be read literally or colloquially, above_good's
+  on "Average spot size: Variable") — this is a real limitation of this specific comparison,
+  not concealed by the method description.
+- **Scope actually covered:** only 2 of the flagship's 3 position-types (2813-type and
+  10305-type). The 19338-type (attractor-holds reconsideration) was deliberately left out of
+  this round to keep it tractable — 8 new reads total (4 positions x entry/exit), not 12.
+
+**Results, checked position by position:**
+
+| Position-type | Condition | Peak word (log-prob) | Confound in preceding text? |
+|---|---|---|---|
+| 10305-type ("Decision:") | baseline | incentiv (-8.171) | No |
+| 10305-type | below_good | incentiv (-7.567) | No |
+| 10305-type | **above_good (original)** | **bias (-5.197)** | No |
+| 2813-type (numeric assumption) | baseline | unbiased (-9.069) | No |
+| 2813-type | below_good | bias (-5.582) | No |
+| 2813-type | above_good (original) | bias (-7.968) | No |
+
+All six cross-condition reads pass the confound check cleanly, same as the original three.
+
+**The 10305-type comparison is the clean, useful result this round was built to get:**
+above_good's signal (-5.197) is roughly 2.4-3.0 log-probability units stronger than either
+baseline (-8.171) or below_good (-7.567) at the same structural position-type — baseline and
+below_good are close to each other and both clearly weaker than above_good. This is genuine,
+if single-position, support for the reading that marker 10305's internal signal is specific to
+the incentivized condition, not just "what any commitment point looks like in Qwen." This is
+the strongest piece of evidence Experiment 9 has produced so far for the original hidden-concept
+hypothesis, precisely because it survives a comparison it could easily have failed.
+
+**The 2813-type comparison does NOT cleanly support the same story, and is reported as a real
+complication, not smoothed over:** below_good's analog (-5.582) is actually the STRONGEST of
+all three conditions here — stronger even than above_good's own original position (-7.968),
+with baseline weakest (-9.069). If the hypothesis were simply "incentivized conditions activate
+bias-concepts more at this position-type," above_good should be strongest, not below_good. Given
+this comparison's positions were matched by relative structural position rather than topic (see
+above), the most likely explanation is that below_good's specific matched sentence (about
+whether "black spots" should be read literally) happens to make bias/unbiased-adjacent concepts
+more contextually available for reasons unrelated to the incentive itself — but this is a
+plausible interpretation, not a confirmed one, on a single data point. Reported honestly as a
+limitation of this specific comparison's method, not as evidence against the 10305-type result.
+
+**Visualizations added:**
+- `heatmap_e9_conditions_analog2813.png`, `heatmap_e9_conditions_analog10305.png` — same
+  style/mechanism as the original three (auto-fit cell text, red/orange flagged-word borders),
+  baseline's entry/exit stacked above below_good's entry/exit, J-lens vs. plain-control side by
+  side. Directly comparable against `heatmap_e9_marker2813.png`/`heatmap_e9_marker10305.png` to
+  see the above_good original side by side with its baseline/below_good analogs.
+- `condition_comparison_e9.png` — the chart this round was built to produce: peak tracked-word
+  log-probability (raw, not normalized, so directly comparable across bars) for each
+  position-type, three bars per group (baseline/below_good/above_good). This is the source of
+  the table above.
+
+**A note on a word that was tried and reverted:** "risk" was added to the exploratory word list
+after it recurred prominently in the heatmap at position-types related to decision-making, then
+removed at the applicant's request after seeing it highlighted everywhere — it recurs too
+generically (ordinary decision-making vocabulary, not a scarce/meaningful signal), so
+highlighting it added clutter rather than surfacing anything. Left as a code comment so this
+isn't retried the same way without a different reason. This affected only heatmap border
+highlighting, never the underlying decoded words themselves, which come straight from the
+model's real output regardless of what's in the tracked-word list.
+
+**Limitations specific to Tier A, on top of the ones already listed above:** still one row per
+condition (not multiple traces); the numeric-assumption comparison's positions differ in topic
+across conditions by construction (a real, not hidden, weakness of relative-position matching);
+the 19338-type comparison and the dip/respike midpoint fix (both part of the original Tier A
+proposal) were not done this round, to keep scope and cost tractable — a natural next increment
+if this direction is worth pursuing further.
+
+**Cost:** 8 new forward-pass reads (a few seconds each once the model — already cached on this
+pod — was loaded, ~40 seconds) plus the plotting/documentation work above. See `BUDGET_neel.md`
+for the session's real elapsed time and GPU-hour estimate.

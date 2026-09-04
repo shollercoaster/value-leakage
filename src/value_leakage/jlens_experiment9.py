@@ -138,18 +138,13 @@ TARGET_MARKERS = {
 # pre-registered, for consistency with how that experiment treated it.
 PRE_REGISTERED_WORDS = ["bias", "manipulate", "cheat", "donation", "threshold", "influence"]
 EXPLORATORY_WORDS = ["dishonesty", "dishonest", "charity", "lie", "unfair", "unbiased",
-                     "incentiv", "reward", "奖励", "激励", "奖金", "獎勵",
-                     # Added AFTER seeing "risk"/"risks"/"risky"/"risking" recur prominently
-                     # in the heatmap at the marker 10305 "Decision:" position -- explicitly
-                     # a post-hoc, exploratory addition (matches the same substring-inclusion
-                     # convention "incentiv" already uses, so this one entry also flags the
-                     # plural/adjective/gerund forms), never promoted to pre-registered, per
-                     # this project's own pre-registration discipline (EXPERIMENTS_NEEL_NANDA.md
-                     # section 6). NOTE: this only affects heatmap highlighting and any FUTURE
-                     # --stage read -- results_e9.json was already saved with the word list
-                     # that did NOT include "risk", so its continuous-score/first-prominence/
-                     # confound-check numbers for "risk" specifically do not exist yet.
-                     "risk"]
+                     "incentiv", "reward", "奖励", "激励", "奖金", "獎勵"]
+# "risk" was tried here as a post-hoc exploratory addition and then REVERTED at the
+# user's request -- it recurs too generically (nearly every "Decision:"-adjacent
+# position uses "risk"/"risky"/"risking" as ordinary decision-making vocabulary), so
+# highlighting it added visual clutter rather than surfacing a meaningful signal,
+# which is the opposite of what the highlighting is for. Left as a comment, not
+# silently dropped, so this isn't retried the same way without reason.
 ALL_TRACKED_WORDS = [(w, "pre_registered") for w in PRE_REGISTERED_WORDS] + \
                     [(w, "exploratory") for w in EXPLORATORY_WORDS]
 
@@ -864,8 +859,13 @@ def _plot_condition_comparison(flagship_records, cond_records, plt):
         return max(scores) if scores else float("nan")
 
     marker_types = sorted(TARGET_MARKERS)
+    # Short kind label per marker type, pulled from the already-saved flagship records
+    # rather than TARGET_MARKERS's long descriptive strings (those overflowed the
+    # x-tick labels into neighboring bars/off the axes in the first render of this chart).
+    kind_by_marker = {m: next(r["kind"] for r in flagship_records if r["marker"] == m)
+                      for m in marker_types}
     conditions = ["baseline", "below_good", "above_good"]
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
     width = 0.25
     for i, cond in enumerate(conditions):
         ys = []
@@ -877,8 +877,8 @@ def _plot_condition_comparison(flagship_records, cond_records, plt):
         xs = [j + (i - 1) * width for j in range(len(marker_types))]
         ax.bar(xs, ys, width, label=cond)
     ax.set_xticks(range(len(marker_types)))
-    ax.set_xticklabels([f"marker {m}\n({TARGET_MARKERS[m]})" for m in marker_types], fontsize=7)
-    ax.set_ylabel("peak tracked-word log-probability (raw, NOT normalized -- comparable across bars)")
+    ax.set_xticklabels([f"marker {m}\n({kind_by_marker[m]})" for m in marker_types], fontsize=9)
+    ax.set_ylabel("peak tracked-word log-probability\n(raw, NOT normalized -- comparable across bars)", fontsize=9)
     ax.set_title(
         "Tier A: is the internal signal at each position-type specific to the incentivized\n"
         "condition, or does it appear in baseline/below_good too? (above_good = the original,\n"
